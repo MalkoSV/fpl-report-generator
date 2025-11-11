@@ -1,0 +1,41 @@
+##############################################################
+# ☕ Java + Maven + Playwright + jpackage + IntelliJ IDEA
+##############################################################
+
+# === 🧱 Maven build artifacts ===
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Maven Wrapper (залишає jar для запуску без Maven)
+!.mvn/wrapper/maven-wrapper.jar
+
+# === 🌐 Playwright browsers ===
+browsers/
+ms-playwright/
+
+# === 🧰 jpackage build output ===
+dist/
+
+# === ⚙️ Java runtime image (від jlink/jpackage) ===
+jre/
+
+# === 🧪 Logs, temporary files ===
+*.log
+*.tmp
+*.bak
+
+# === 🪄 IDE: IntelliJ IDEA / JetBrains ===
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# === 💻 OS / system ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === 🪶 Misc ===
+*.exe
+*.msi

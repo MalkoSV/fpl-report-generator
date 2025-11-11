@@ -1,0 +1,1 @@
+fpl-scraper-standalone.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
