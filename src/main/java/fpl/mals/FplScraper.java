@@ -26,7 +26,7 @@ public class FplScraper {
 
             if (standingsPageCount == 0) {
                 logger.info("Program terminated. Good luck!");
-                Thread.sleep(5000);
+                Thread.sleep(3000);
                 System.exit(0);
             }
 

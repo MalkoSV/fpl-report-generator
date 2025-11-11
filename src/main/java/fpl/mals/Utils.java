@@ -41,7 +41,13 @@ public class Utils {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final Logger logger = Logger.getLogger(Utils.class.getName());
-    private static final String PLAYER_SELECTOR = "._174gkcl5._174gkcl0";
+    private static final String PLAYER_SELECTOR_FOR_ALL = "[class*=\"_174gkcl\"]";
+    private static final String PLAYER_SELECTOR_FOR_100PC_CHANCE = "._174gkcl5";
+    private static final String PLAYER_SELECTOR_FOR_75PC_CHANCE = "._174gkcl4";
+    private static final String PLAYER_SELECTOR_FOR_50PC_CHANCE = "._174gkcl3";
+    private static final String PLAYER_SELECTOR_FOR_25PC_CHANCE = "._174gkcl2";
+    private static final String PLAYER_SELECTOR_FOR_0PC_CHANCE = "._174gkcl1";
+
     private static final String BASE_URL = "https://fantasy.premierleague.com";
     private static final String BASE_OVERALL_LEAGUE_PATH = "/leagues/314/standings/c";
     private static final String RECORD_LINK_SELECTOR = "a._1jqkqxq4";
@@ -78,10 +84,11 @@ public class Utils {
                      """ + CYAN + """
                     =====================================================================
                     """ + RESET + BOLD + """
-                    Enter the number of pages to parse (0 - exit): \s""" + RESET);
+                    Enter the number of pages to parse (0 - exit):\s""" + RESET);
 
             if (scanner.hasNextInt()) {
                 pageCount = scanner.nextInt();
+                scanner.nextLine();
                 System.out.println();
                 if (pageCount >= 0) {
                     return pageCount;
@@ -90,8 +97,8 @@ public class Utils {
                 }
             } else {
                 System.out.println("⚠️ Error: a number is required!");
+                scanner.nextLine();
             }
-            scanner.nextLine();
         }
     }
 
@@ -110,6 +117,7 @@ public class Utils {
 
             if (scanner.hasNextInt()) {
                 mode = scanner.nextInt();
+                scanner.nextLine();
                 System.out.println();
                 if (mode >= 1 && mode <= 2) {
                     return mode;
@@ -118,9 +126,100 @@ public class Utils {
                 }
             } else {
                 System.out.println("⚠️ Error: a number is required!");
+                scanner.nextLine();
             }
-            scanner.nextLine();
         }
+    }
+
+    public static String getPlayerSelector() {
+        String result;
+        int filterType;
+        while (true) {
+            System.out.print(CYAN + """
+            =======================================================
+                         PLAYER FILTER BY AVAILABILITY
+            =======================================================
+            """ + RESET +
+                    GREEN + " 1 " + RESET + "- All players\n" +
+                    GREEN + " 2 " + RESET + "- Available to play\n" +
+                    GREEN + " 3 " + RESET + "- All with limited availability\n" +
+                    GREEN + " 4 " + RESET + "- 75% chance of playing only\n" +
+                    GREEN + " 5 " + RESET + "- 50% chance of playing only\n" +
+                    GREEN + " 6 " + RESET + "- 25% chance of playing only\n" +
+                    GREEN + " 7 " + RESET + "- Unavailable to play\n" +
+                    GREEN + " 8 " + RESET + "- Doubtful, Unlikely or Unavailable to play (0-50%)\n" +
+                    CYAN + "=======================================================\n" + RESET +
+                    BOLD + "Choose a filter: " + RESET);
+
+            if (scanner.hasNextInt()) {
+                filterType = scanner.nextInt();
+                scanner.nextLine();
+                System.out.println();
+                if (filterType >= 1 && filterType <= 8) {
+                    break;
+                } else {
+                    System.out.println("⚠️ Error: the number must be between 1 and 8");
+                }
+            } else {
+                System.out.println("⚠️ Error: a number is required!");
+                scanner.nextLine();
+            }
+        }
+
+        result = switch (filterType) {
+            case 1 -> {
+                System.out.println("✅ Your choice - All players!");
+                System.out.println("ℹ️  Includes all players regardless of status.");
+                yield PLAYER_SELECTOR_FOR_ALL;
+            }
+            case 2 -> {
+                System.out.println("✅ Your choice - Available to play!");
+                System.out.println("ℹ️  Players who are fully fit and expected to play.");
+                yield PLAYER_SELECTOR_FOR_100PC_CHANCE;
+            }
+            case 3 -> {
+                System.out.println("✅ Your choice - All with limited availability!");
+                System.out.println("ℹ️  Players who are not fully fit or unavailable.");
+                yield String.join(", ",
+                        PLAYER_SELECTOR_FOR_75PC_CHANCE,
+                        PLAYER_SELECTOR_FOR_50PC_CHANCE,
+                        PLAYER_SELECTOR_FOR_25PC_CHANCE,
+                        PLAYER_SELECTOR_FOR_0PC_CHANCE
+                );
+            }
+            case 4 -> {
+                System.out.println("✅ Your choice - 75% chance of playing only!");
+                System.out.println("ℹ️  Players likely to play, but not guaranteed.");
+                yield PLAYER_SELECTOR_FOR_75PC_CHANCE;
+            }
+            case 5 -> {
+                System.out.println("✅ Your choice - 50% chance of playing only!");
+                System.out.println("ℹ️  Doubtful players — 50/50 chance of participation.");
+                yield PLAYER_SELECTOR_FOR_50PC_CHANCE;
+            }
+            case 6 -> {
+                System.out.println("✅ Your choice - 25% chance of playing only!");
+                System.out.println("ℹ️  Players with a low probability of appearing.");
+                yield PLAYER_SELECTOR_FOR_25PC_CHANCE;
+            }
+            case 7 -> {
+                System.out.println("✅ Your choice - Unavailable to play!");
+                System.out.println("ℹ️  Injured, suspended, or otherwise unavailable players.");
+                yield PLAYER_SELECTOR_FOR_0PC_CHANCE;
+            }
+            case 8 -> {
+                System.out.println("✅ Your choice - Doubtful, unlikely or unavailable to play (0-50%)!");
+                System.out.println("ℹ️  Questionable or unavailable players.");
+                yield String.join(", ",
+                        PLAYER_SELECTOR_FOR_50PC_CHANCE,
+                        PLAYER_SELECTOR_FOR_25PC_CHANCE,
+                        PLAYER_SELECTOR_FOR_0PC_CHANCE
+                );
+            }
+            default -> throw new IllegalArgumentException("Unknown filter type: " + filterType);
+        };
+
+        return result;
     }
 
     public static List<String> getTeamLinks(Page page, String url) {
@@ -137,10 +236,11 @@ public class Utils {
         Map<String, Integer> players = new HashMap<>();
         AtomicInteger counter = new AtomicInteger(0);
         int total = teamLinks.size();
+        String playerSelector = getPlayerSelector();
 
         for (String link : teamLinks) {
             page.navigate(link);
-            Locator player = page.locator(PLAYER_SELECTOR);
+            Locator player = page.locator(playerSelector);
             player.last().waitFor();
 
             for (Locator el : player.all()) {
@@ -159,6 +259,7 @@ public class Utils {
         Map<String, Integer> players = new ConcurrentHashMap<>();
         AtomicInteger counter = new AtomicInteger(0);
         int total = teamLinks.size();
+        String playerSelector = getPlayerSelector();
 
         int browserCount = Math.min(5, Runtime.getRuntime().availableProcessors());
         logger.info("⏱️ Using " + browserCount + " browser threads!");
@@ -177,12 +278,14 @@ public class Utils {
                     for (String link : teamSublist) {
                         try {
                             page.navigate(link);
-                            Locator player = page.locator(PLAYER_SELECTOR);
-                            player.last().waitFor();
+                            page.locator(PLAYER_SELECTOR_FOR_ALL).last().waitFor();
+
+                            Locator player = page.locator(playerSelector);
+                            List<Locator> teamPlayers = player.all();
 
                             boolean hasPlayer = absentPlayer == null;
 
-                            for (Locator el : player.all()) {
+                            for (Locator el : teamPlayers) {
                                 String name = el.innerText().trim();
                                 players.merge(name, 1, Integer::sum);
 
@@ -192,7 +295,7 @@ public class Utils {
                             }
 
                             int done = counter.incrementAndGet();
-                            System.out.printf("✅ [%d/%d] %s%n", done, total, link);
+                            System.out.printf("✅ %d players, [%d/%d] %s%n", teamPlayers.size(), done, total, link);
 
                             if (!hasPlayer) {
                                 System.out.printf("❌ %s is absent in this team%n", absentPlayer);
