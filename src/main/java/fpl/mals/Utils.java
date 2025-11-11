@@ -57,6 +57,48 @@ public class Utils {
     private static final String GREEN = "\u001B[32m";
     private static final String RED = "\u001B[31m";
     private static final String BOLD = "\u001B[1m";
+    private static final String DESCRIPTION_FOR_ENTER_PAGE_NUMBER = CYAN + """
+            =====================================================================
+             ⚽ FPL SCRAPER
+            =====================================================================
+            """ + RESET + """                         
+            Every standings page displays names of 50 teams.
+            Page #1: 1-50 position
+            Page #2: 51-100 position
+            ...
+            You choose the number of standing pages starting from #1 onwards.
+            That is, if you enter, for example, 4 pages,
+            it means viewing teams occupying positions 1 through 200.
+            """ + CYAN + """
+            =====================================================================
+            """ + RESET + BOLD + """
+            Enter the number of pages to parse (0 - exit):\s""" + RESET;
+
+    private static final String DESCRIPTION_FOR_CHOOSE_THREAD_MODE = CYAN + """
+            ==========================================
+                          SCRAPING MODES
+            ==========================================
+            """ + RESET +
+            GREEN + " 1 " + RESET + "- Single-threaded mode\n" +
+            GREEN + " 2 " + RESET + "- Multi-threaded mode by Browser pool\n" +
+            CYAN + "==========================================\n" + RESET +
+            BOLD + "Choose thread mode: " + RESET;
+
+    private static final String DESCRIPTION_FOR_CHOOSE_PLAYER_SELECTOR = CYAN + """
+            =======================================================
+                         PLAYER FILTER BY AVAILABILITY
+            =======================================================
+            """ + RESET +
+            GREEN + " 1 " + RESET + "- All players\n" +
+            GREEN + " 2 " + RESET + "- Available to play\n" +
+            GREEN + " 3 " + RESET + "- All with limited availability\n" +
+            GREEN + " 4 " + RESET + "- 75% chance of playing only\n" +
+            GREEN + " 5 " + RESET + "- 50% chance of playing only\n" +
+            GREEN + " 6 " + RESET + "- 25% chance of playing only\n" +
+            GREEN + " 7 " + RESET + "- Unavailable to play\n" +
+            GREEN + " 8 " + RESET + "- Doubtful, unlikely or unavailable to play (0-50%)\n" +
+            CYAN + "=======================================================\n" + RESET +
+            BOLD + "Choose a filter: " + RESET;
 
     public static String getFullUrl(String urlEnd) {
         return BASE_URL + urlEnd;
@@ -66,120 +108,59 @@ public class Utils {
         return getFullUrl(BASE_OVERALL_LEAGUE_PATH + "?page_standings=" + pageNumber);
     }
 
-    public static int getEnteredPageCount() {
-        int pageCount;
+    public static int getEnteredNumber(String description, int min, int max) {
+        int result;
         while (true) {
-            System.out.print(CYAN + """
-                    =====================================================================
-                     ⚽ FPL SCRAPER
-                    =====================================================================
-                    """ + RESET + """                         
-                     Every standings page displays names of 50 teams.
-                     Page #1: 1-50 position
-                     Page #2: 51-100 position
-                     ...
-                     You choose the number of standing pages starting from #1 onwards.
-                     That is, if you enter, for example, 4 pages,
-                     it means viewing teams occupying positions 1 through 200.
-                     """ + CYAN + """
-                    =====================================================================
-                    """ + RESET + BOLD + """
-                    Enter the number of pages to parse (0 - exit):\s""" + RESET);
+            System.out.print(description);
 
             if (scanner.hasNextInt()) {
-                pageCount = scanner.nextInt();
+                result = scanner.nextInt();
                 scanner.nextLine();
                 System.out.println();
-                if (pageCount >= 0) {
-                    return pageCount;
+                if (result >= min && result <= max) {
+                    break;
                 } else {
-                    System.out.println("⚠️ Error: the number must be greater than zero!");
+                    System.out.printf("⚠️ Error: the number must be between %d and %d%n", min, max);
                 }
             } else {
                 System.out.println("⚠️ Error: a number is required!");
                 scanner.nextLine();
             }
         }
+        return result;
+    }
+
+    public static int getEnteredPageCount() {
+        return getEnteredNumber(DESCRIPTION_FOR_ENTER_PAGE_NUMBER, 0, 20);
     }
 
     public static int getThreadMode() {
-        int mode;
-        while (true) {
-            System.out.print(CYAN + """
-            ==========================================
-                          SCRAPING MODES
-            ==========================================
-            """ + RESET +
-                    GREEN + " 1 " + RESET + "- Single-threaded mode\n" +
-                    GREEN + " 2 " + RESET + "- Multi-threaded mode by Browser pool\n" +
-                    CYAN + "==========================================\n" + RESET +
-                    BOLD + "Choose thread mode: " + RESET);
-
-            if (scanner.hasNextInt()) {
-                mode = scanner.nextInt();
-                scanner.nextLine();
-                System.out.println();
-                if (mode >= 1 && mode <= 2) {
-                    return mode;
-                } else {
-                    System.out.println("⚠️ Error: the number must be between 1 and 2");
-                }
-            } else {
-                System.out.println("⚠️ Error: a number is required!");
-                scanner.nextLine();
-            }
-        }
+        return getEnteredNumber(DESCRIPTION_FOR_CHOOSE_THREAD_MODE, 1, 2);
     }
 
     public static String getPlayerSelector() {
-        String result;
-        int filterType;
-        while (true) {
-            System.out.print(CYAN + """
-            =======================================================
-                         PLAYER FILTER BY AVAILABILITY
-            =======================================================
-            """ + RESET +
-                    GREEN + " 1 " + RESET + "- All players\n" +
-                    GREEN + " 2 " + RESET + "- Available to play\n" +
-                    GREEN + " 3 " + RESET + "- All with limited availability\n" +
-                    GREEN + " 4 " + RESET + "- 75% chance of playing only\n" +
-                    GREEN + " 5 " + RESET + "- 50% chance of playing only\n" +
-                    GREEN + " 6 " + RESET + "- 25% chance of playing only\n" +
-                    GREEN + " 7 " + RESET + "- Unavailable to play\n" +
-                    GREEN + " 8 " + RESET + "- Doubtful, Unlikely or Unavailable to play (0-50%)\n" +
-                    CYAN + "=======================================================\n" + RESET +
-                    BOLD + "Choose a filter: " + RESET);
+        int filterType = getEnteredNumber(DESCRIPTION_FOR_CHOOSE_PLAYER_SELECTOR, 1, 8);
 
-            if (scanner.hasNextInt()) {
-                filterType = scanner.nextInt();
-                scanner.nextLine();
-                System.out.println();
-                if (filterType >= 1 && filterType <= 8) {
-                    break;
-                } else {
-                    System.out.println("⚠️ Error: the number must be between 1 and 8");
-                }
-            } else {
-                System.out.println("⚠️ Error: a number is required!");
-                scanner.nextLine();
-            }
-        }
-
-        result = switch (filterType) {
+        return switch (filterType) {
             case 1 -> {
-                System.out.println("✅ Your choice - All players!");
-                System.out.println("ℹ️  Includes all players regardless of status.");
+                System.out.println("""
+                        ✅ Your choice - All players!
+                        ℹ️  Includes all players regardless of status.
+                        """);
                 yield PLAYER_SELECTOR_FOR_ALL;
             }
             case 2 -> {
-                System.out.println("✅ Your choice - Available to play!");
-                System.out.println("ℹ️  Players who are fully fit and expected to play.");
+                System.out.println("""
+                        ✅ Your choice - Available to play!
+                        ℹ️  Players who are fully fit and expected to play.
+                        """);
                 yield PLAYER_SELECTOR_FOR_100PC_CHANCE;
             }
             case 3 -> {
-                System.out.println("✅ Your choice - All with limited availability!");
-                System.out.println("ℹ️  Players who are not fully fit or unavailable.");
+                System.out.println("""
+                        ✅ Your choice - All with limited availability!
+                        ℹ️  Players who are not fully fit or unavailable.
+                        """);
                 yield String.join(", ",
                         PLAYER_SELECTOR_FOR_75PC_CHANCE,
                         PLAYER_SELECTOR_FOR_50PC_CHANCE,
@@ -188,28 +169,38 @@ public class Utils {
                 );
             }
             case 4 -> {
-                System.out.println("✅ Your choice - 75% chance of playing only!");
-                System.out.println("ℹ️  Players likely to play, but not guaranteed.");
+                System.out.println("""
+                        ✅ Your choice - 75% chance of playing only!
+                        ℹ️  Players likely to play, but not guaranteed.
+                        """);
                 yield PLAYER_SELECTOR_FOR_75PC_CHANCE;
             }
             case 5 -> {
-                System.out.println("✅ Your choice - 50% chance of playing only!");
-                System.out.println("ℹ️  Doubtful players — 50/50 chance of participation.");
+                System.out.println("""
+                        ✅ Your choice - 50% chance of playing only!
+                        ℹ️  Doubtful players — 50/50 chance of participation.
+                        """);
                 yield PLAYER_SELECTOR_FOR_50PC_CHANCE;
             }
             case 6 -> {
-                System.out.println("✅ Your choice - 25% chance of playing only!");
-                System.out.println("ℹ️  Players with a low probability of appearing.");
+                System.out.println("""
+                        ✅ Your choice - 25% chance of playing only!
+                        ℹ️  Players with a low probability of appearing.
+                        """);
                 yield PLAYER_SELECTOR_FOR_25PC_CHANCE;
             }
             case 7 -> {
-                System.out.println("✅ Your choice - Unavailable to play!");
-                System.out.println("ℹ️  Injured, suspended, or otherwise unavailable players.");
+                System.out.println("""
+                        ✅ Your choice - Unavailable to play!
+                        ℹ️  Injured, suspended, or otherwise unavailable players.
+                        """);
                 yield PLAYER_SELECTOR_FOR_0PC_CHANCE;
             }
             case 8 -> {
-                System.out.println("✅ Your choice - Doubtful, unlikely or unavailable to play (0-50%)!");
-                System.out.println("ℹ️  Questionable or unavailable players.");
+                System.out.println("""
+                        ✅ Your choice - Doubtful, unlikely or unavailable to play (0-50%)!
+                        ℹ️  Questionable or unavailable players.
+                        """);
                 yield String.join(", ",
                         PLAYER_SELECTOR_FOR_50PC_CHANCE,
                         PLAYER_SELECTOR_FOR_25PC_CHANCE,
@@ -218,8 +209,6 @@ public class Utils {
             }
             default -> throw new IllegalArgumentException("Unknown filter type: " + filterType);
         };
-
-        return result;
     }
 
     public static List<String> getTeamLinks(Page page, String url) {
