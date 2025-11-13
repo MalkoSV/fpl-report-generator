@@ -21,7 +21,7 @@ public class FplScraper {
         long startTime = System.currentTimeMillis();
 
         List<String> allTeamLinks = Utils.getAllTeamLinks(standingsPageCount);
-        logger.info("✅ All team links received.");
+        logger.info("✅ All team links received (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");
 
         Map<String, Integer> players = Utils.collectPlayers(allTeamLinks, playerSelector, ABSENT_PLAYER);
 

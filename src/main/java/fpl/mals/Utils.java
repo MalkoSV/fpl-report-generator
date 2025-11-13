@@ -58,6 +58,7 @@ public class Utils {
     private static final String SELECTOR_FOR_OFFENDER = "._1k6tww15 ._2j6lqn6";
     private static final String SELECTOR_FOR_BENCH = "//h4[.=\"Substitutes\"]/following-sibling::*[1]";
     private static final String SELECTOR_FOR_NAME = "._174gkcl0";
+    private static final String SELECTOR_FOR_CAPTAIN_ICON = "svg[aria-label='Captain']";
 
     private static final String RESET = "\u001B[0m";
     private static final String YELLOW = "\u001B[33m";
@@ -65,6 +66,7 @@ public class Utils {
     private static final String GREEN = "\u001B[32m";
     private static final String RED = "\u001B[31m";
     private static final String BOLD = "\u001B[1m";
+
     private static final String DESCRIPTION_FOR_ENTER_PAGE_NUMBER = CYAN + """
             ===================================================
              ⚽ FPL SCRAPER
@@ -83,13 +85,14 @@ public class Utils {
 
     private static final String DESCRIPTION_FOR_CHOOSE_PLAYER_SELECTOR = CYAN + """
             =======================================================
-                         PLAYER FILTER BY AVAILABILITY
+                                   PLAYERS FILTER
             =======================================================
             """ + RESET +
             GREEN + " 1 " + RESET + "- ALL players\n" +
             GREEN + " 2 " + RESET + "- Doubtful, unlikely or unavailable to play (0-50%)\n" +
             GREEN + " 3 " + RESET + "- START SQUAD\n" +
-            GREEN + " 4 " + RESET + "- BENCH\n" +
+            GREEN + " 4 " + RESET + "- CAPTAIN\n" +
+            GREEN + " 5 " + RESET + "- BENCH\n" +
             CYAN + "=======================================================\n" + RESET +
             BOLD + "Choose a filter: " + RESET;
 
@@ -140,7 +143,14 @@ public class Utils {
     }
 
     public static String getPlayerSelector() {
-        int filterType = getEnteredNumber(DESCRIPTION_FOR_CHOOSE_PLAYER_SELECTOR, 1, 4);
+        String selectorForStartSquad = String.join(", ",
+                SELECTOR_FOR_GOALKEAPER,
+                SELECTOR_FOR_DEFENDER,
+                SELECTOR_FOR_MIDFIELDER,
+                SELECTOR_FOR_OFFENDER
+        );
+
+        int filterType = getEnteredNumber(DESCRIPTION_FOR_CHOOSE_PLAYER_SELECTOR, 1, 5);
 
         return switch (filterType) {
             case 1 -> {
@@ -172,16 +182,18 @@ public class Utils {
                         ✅ Your choice - START SQUAD!
                         ℹ️  Collect 11 players from start squad.
                         """);
-                yield String.join(", ",
-                        getSelectorForName(SELECTOR_FOR_GOALKEAPER),
-                        getSelectorForName(SELECTOR_FOR_DEFENDER),
-                        getSelectorForName(SELECTOR_FOR_MIDFIELDER),
-                        getSelectorForName(SELECTOR_FOR_OFFENDER)
-                );
+                yield getSelectorForName(String.format(":is(%s)",selectorForStartSquad));
             }
             case 4 -> {
                 System.out.println("""
-                        ✅ Your choice - BENCH!
+                        ✅ Your choice - CAPTAIN!
+                        ℹ️  Collect players with CAPTAIN role.
+                        """);
+                yield getSelectorForName(String.format(":is(%s):has(%s)",selectorForStartSquad, SELECTOR_FOR_CAPTAIN_ICON));
+            }
+            case 5 -> {
+                System.out.println("""
+                        ✅ Your choice - BENCH!1
                         ℹ️  Collect 4 players from bench.
                         """);
                 yield SELECTOR_FOR_BENCH + " >> " + SELECTOR_FOR_NAME;
