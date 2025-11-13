@@ -17,10 +17,12 @@ public class FplScraper {
         Utils.terminateProgramIfNeeded(standingsPageCount);
         String playerSelector = Utils.getPlayerSelector();
 
-        logger.info("✅ Start parsing from " + standingsPageCount + " pages (" + standingsPageCount * 50 + " teams)");
+        logger.info("ℹ️ Start parsing from " + standingsPageCount + " pages (" + standingsPageCount * 50 + " teams)");
         long startTime = System.currentTimeMillis();
 
         List<String> allTeamLinks = Utils.getAllTeamLinks(standingsPageCount);
+        logger.info("✅ All team links received.");
+
         Map<String, Integer> players = Utils.collectPlayers(allTeamLinks, playerSelector, ABSENT_PLAYER);
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));

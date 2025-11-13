@@ -42,21 +42,23 @@ public class Utils {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final Logger logger = Logger.getLogger(Utils.class.getName());
+
+    private static final String BASE_URL = "https://fantasy.premierleague.com";
+    private static final String BASE_OVERALL_LEAGUE_PATH = "/leagues/314/standings/c";
+    private static final String RECORD_LINK_SELECTOR = "a._1jqkqxq4";
+
     private static final String PLAYER_SELECTOR_FOR_100PC_CHANCE = "._174gkcl5";
     private static final String PLAYER_SELECTOR_FOR_75PC_CHANCE = "._174gkcl4";
     private static final String PLAYER_SELECTOR_FOR_50PC_CHANCE = "._174gkcl3";
     private static final String PLAYER_SELECTOR_FOR_25PC_CHANCE = "._174gkcl2";
     private static final String PLAYER_SELECTOR_FOR_0PC_CHANCE = "._174gkcl1";
-    private static final String PLAYER_SELECTOR_FOR_ALL = String.join(", ",
-            PLAYER_SELECTOR_FOR_100PC_CHANCE,
-            PLAYER_SELECTOR_FOR_75PC_CHANCE,
-            PLAYER_SELECTOR_FOR_50PC_CHANCE,
-            PLAYER_SELECTOR_FOR_25PC_CHANCE,
-            PLAYER_SELECTOR_FOR_0PC_CHANCE
-    );
-    private static final String BASE_URL = "https://fantasy.premierleague.com";
-    private static final String BASE_OVERALL_LEAGUE_PATH = "/leagues/314/standings/c";
-    private static final String RECORD_LINK_SELECTOR = "a._1jqkqxq4";
+    private static final String SELECTOR_FOR_GOALKEAPER = "._1k6tww12 ._2j6lqn6";
+    private static final String SELECTOR_FOR_DEFENDER = "._1k6tww13 ._2j6lqn6";
+    private static final String SELECTOR_FOR_MIDFIELDER = "._1k6tww14 ._2j6lqn6";
+    private static final String SELECTOR_FOR_OFFENDER = "._1k6tww15 ._2j6lqn6";
+    private static final String SELECTOR_FOR_BENCH = "//h4[.=\"Substitutes\"]/following-sibling::*[1]";
+    private static final String SELECTOR_FOR_NAME = "._174gkcl0";
+
     private static final String RESET = "\u001B[0m";
     private static final String YELLOW = "\u001B[33m";
     private static final String CYAN = "\u001B[36m";
@@ -84,17 +86,16 @@ public class Utils {
                          PLAYER FILTER BY AVAILABILITY
             =======================================================
             """ + RESET +
-            GREEN + " 1 " + RESET + "- All players\n" +
-            GREEN + " 2 " + RESET + "- Available to play\n" +
-            GREEN + " 3 " + RESET + "- All with limited availability\n" +
-            GREEN + " 4 " + RESET + "- 75% chance of playing only\n" +
-            GREEN + " 5 " + RESET + "- 50% chance of playing only\n" +
-            GREEN + " 6 " + RESET + "- 25% chance of playing only\n" +
-            GREEN + " 7 " + RESET + "- Unavailable to play\n" +
-            GREEN + " 8 " + RESET + "- Doubtful, unlikely or unavailable to play (0-50%)\n" +
+            GREEN + " 1 " + RESET + "- ALL players\n" +
+            GREEN + " 2 " + RESET + "- Doubtful, unlikely or unavailable to play (0-50%)\n" +
+            GREEN + " 3 " + RESET + "- START SQUAD\n" +
+            GREEN + " 4 " + RESET + "- BENCH\n" +
             CYAN + "=======================================================\n" + RESET +
             BOLD + "Choose a filter: " + RESET;
 
+    public static String getSelectorForName(String selector) {
+        return selector + " " + SELECTOR_FOR_NAME;
+    }
     public static String getFullUrl(String urlEnd) {
         return BASE_URL + urlEnd;
     }
@@ -139,7 +140,7 @@ public class Utils {
     }
 
     public static String getPlayerSelector() {
-        int filterType = getEnteredNumber(DESCRIPTION_FOR_CHOOSE_PLAYER_SELECTOR, 1, 8);
+        int filterType = getEnteredNumber(DESCRIPTION_FOR_CHOOSE_PLAYER_SELECTOR, 1, 4);
 
         return switch (filterType) {
             case 1 -> {
@@ -147,56 +148,15 @@ public class Utils {
                         ✅ Your choice - All players!
                         ℹ️  Includes all players regardless of status.
                         """);
-                yield PLAYER_SELECTOR_FOR_ALL;
-            }
-            case 2 -> {
-                System.out.println("""
-                        ✅ Your choice - Available to play!
-                        ℹ️  Players who are fully fit and expected to play.
-                        """);
-                yield PLAYER_SELECTOR_FOR_100PC_CHANCE;
-            }
-            case 3 -> {
-                System.out.println("""
-                        ✅ Your choice - All with limited availability!
-                        ℹ️  Players who are not fully fit or unavailable.
-                        """);
                 yield String.join(", ",
+                        PLAYER_SELECTOR_FOR_100PC_CHANCE,
                         PLAYER_SELECTOR_FOR_75PC_CHANCE,
                         PLAYER_SELECTOR_FOR_50PC_CHANCE,
                         PLAYER_SELECTOR_FOR_25PC_CHANCE,
                         PLAYER_SELECTOR_FOR_0PC_CHANCE
                 );
             }
-            case 4 -> {
-                System.out.println("""
-                        ✅ Your choice - 75% chance of playing only!
-                        ℹ️  Players likely to play, but not guaranteed.
-                        """);
-                yield PLAYER_SELECTOR_FOR_75PC_CHANCE;
-            }
-            case 5 -> {
-                System.out.println("""
-                        ✅ Your choice - 50% chance of playing only!
-                        ℹ️  Doubtful players — 50/50 chance of participation.
-                        """);
-                yield PLAYER_SELECTOR_FOR_50PC_CHANCE;
-            }
-            case 6 -> {
-                System.out.println("""
-                        ✅ Your choice - 25% chance of playing only!
-                        ℹ️  Players with a low probability of appearing.
-                        """);
-                yield PLAYER_SELECTOR_FOR_25PC_CHANCE;
-            }
-            case 7 -> {
-                System.out.println("""
-                        ✅ Your choice - Unavailable to play!
-                        ℹ️  Injured, suspended, or otherwise unavailable players.
-                        """);
-                yield PLAYER_SELECTOR_FOR_0PC_CHANCE;
-            }
-            case 8 -> {
+            case 2 -> {
                 System.out.println("""
                         ✅ Your choice - Doubtful, unlikely or unavailable to play (0-50%)!
                         ℹ️  Questionable or unavailable players.
@@ -206,6 +166,25 @@ public class Utils {
                         PLAYER_SELECTOR_FOR_25PC_CHANCE,
                         PLAYER_SELECTOR_FOR_0PC_CHANCE
                 );
+            }
+            case 3 -> {
+                System.out.println("""
+                        ✅ Your choice - START SQUAD!
+                        ℹ️  Collect 11 players from start squad.
+                        """);
+                yield String.join(", ",
+                        getSelectorForName(SELECTOR_FOR_GOALKEAPER),
+                        getSelectorForName(SELECTOR_FOR_DEFENDER),
+                        getSelectorForName(SELECTOR_FOR_MIDFIELDER),
+                        getSelectorForName(SELECTOR_FOR_OFFENDER)
+                );
+            }
+            case 4 -> {
+                System.out.println("""
+                        ✅ Your choice - BENCH!
+                        ℹ️  Collect 4 players from bench.
+                        """);
+                yield SELECTOR_FOR_BENCH + " >> " + SELECTOR_FOR_NAME;
             }
             default -> throw new IllegalArgumentException("Unknown filter type: " + filterType);
         };
@@ -258,7 +237,7 @@ public class Utils {
                     for (String link : teamSublist) {
                         try {
                             page.navigate(link);
-                            page.locator(PLAYER_SELECTOR_FOR_ALL).last().waitFor();
+                            page.locator(SELECTOR_FOR_NAME).last().waitFor();
 
                             Locator player = page.locator(playerSelector);
                             List<Locator> teamPlayers = player.all();
