@@ -26,7 +26,7 @@ public class FplScraper {
         Map<String, Integer> players = Utils.collectPlayers(allTeamLinks, playerSelector, ABSENT_PLAYER);
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));
-        String fileName = String.format("FPL_Teams_top%d(%d_players-%ds_duration)_%s.xlsx",
+        String fileName = "FPL_Teams_top%d(%d_players-%ds_duration)_%s.xlsx".formatted(
                 allTeamLinks.size(), players.size(), (System.currentTimeMillis() - startTime) / 1000, timestamp);
 
         Utils.saveResultsToExcel(players, fileName, args);

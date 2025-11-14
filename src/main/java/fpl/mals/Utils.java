@@ -47,18 +47,19 @@ public class Utils {
     private static final String BASE_OVERALL_LEAGUE_PATH = "/leagues/314/standings/c";
     private static final String RECORD_LINK_SELECTOR = "a._1jqkqxq4";
 
-    private static final String PLAYER_SELECTOR_FOR_100PC_CHANCE = "._174gkcl5";
-    private static final String PLAYER_SELECTOR_FOR_75PC_CHANCE = "._174gkcl4";
-    private static final String PLAYER_SELECTOR_FOR_50PC_CHANCE = "._174gkcl3";
-    private static final String PLAYER_SELECTOR_FOR_25PC_CHANCE = "._174gkcl2";
-    private static final String PLAYER_SELECTOR_FOR_0PC_CHANCE = "._174gkcl1";
-    private static final String SELECTOR_FOR_GOALKEAPER = "._1k6tww12 ._2j6lqn6";
-    private static final String SELECTOR_FOR_DEFENDER = "._1k6tww13 ._2j6lqn6";
-    private static final String SELECTOR_FOR_MIDFIELDER = "._1k6tww14 ._2j6lqn6";
-    private static final String SELECTOR_FOR_OFFENDER = "._1k6tww15 ._2j6lqn6";
-    private static final String SELECTOR_FOR_BENCH = "//h4[.=\"Substitutes\"]/following-sibling::*[1]";
-    private static final String SELECTOR_FOR_NAME = "._174gkcl0";
-    private static final String SELECTOR_FOR_CAPTAIN_ICON = "svg[aria-label='Captain']";
+    private static final String ALL_PLAYERS_SELECTOR = "._2j6lqn7";
+    private static final String FOR_100PC_PLAYER_SELECTOR = "._174gkcl5";
+    private static final String FOR_75PC_PLAYER_SELECTOR = "._174gkcl4";
+    private static final String FOR_50PC_PLAYER_SELECTOR = "._174gkcl3";
+    private static final String FOR_25PC_PLAYER_SELECTOR = "._174gkcl2";
+    private static final String FOR_0PC_PLAYER_SELECTOR = "._174gkcl1";
+    private static final String GOALKEAPER_SELECTOR = "._1k6tww12 ._2j6lqn6";
+    private static final String DEFENDER_SELECTOR = "._1k6tww13 ._2j6lqn6";
+    private static final String MIDFIELDER_SELECTOR = "._1k6tww14 ._2j6lqn6";
+    private static final String OFFENDER_SELECTOR = "._1k6tww15 ._2j6lqn6";
+    private static final String BENCH_SELECTOR = ".tczxyc5";
+    private static final String NAME_SELECTOR = "._174gkcl0";
+    private static final String CAPTAIN_ICON_SELECTOR = "svg[aria-label='Captain']";
 
     private static final String RESET = "\u001B[0m";
     private static final String YELLOW = "\u001B[33m";
@@ -85,26 +86,31 @@ public class Utils {
 
     private static final String DESCRIPTION_FOR_CHOOSE_PLAYER_SELECTOR = CYAN + """
             =======================================================
-                                   PLAYERS FILTER
+                                  PLAYERS FILTER
             =======================================================
             """ + RESET +
             GREEN + " 1 " + RESET + "- ALL players\n" +
-            GREEN + " 2 " + RESET + "- Doubtful, unlikely or unavailable to play (0-50%)\n" +
-            GREEN + " 3 " + RESET + "- START SQUAD\n" +
-            GREEN + " 4 " + RESET + "- CAPTAIN\n" +
-            GREEN + " 5 " + RESET + "- BENCH\n" +
+            GREEN + " 2 " + RESET + "- START SQUAD\n" +
+            GREEN + " 3 " + RESET + "- CAPTAIN\n" +
+            GREEN + " 4 " + RESET + "- BENCH\n" +
+            GREEN + " 5 " + RESET + "- Doubtful, unlikely or unavailable to play (0-50%)\n" +
             CYAN + "=======================================================\n" + RESET +
             BOLD + "Choose a filter: " + RESET;
 
-    public static String getSelectorForName(String selector) {
-        return selector + " " + SELECTOR_FOR_NAME;
-    }
     public static String getFullUrl(String urlEnd) {
         return BASE_URL + urlEnd;
     }
 
     public static String getStandingsPageUrl(int pageNumber) {
         return getFullUrl(BASE_OVERALL_LEAGUE_PATH + "?page_standings=" + pageNumber);
+    }
+
+    public static String filterSelectorByChild(String selector, String child) {
+        return ":is(%s):has(%s)".formatted(selector, child);
+    }
+
+    public static String getSelectorChild(String selector, String child) {
+        return ":is(%s) %s".formatted(selector, child);
     }
 
     public static void terminateProgramIfNeeded(int pageNumber) throws InterruptedException {
@@ -143,13 +149,6 @@ public class Utils {
     }
 
     public static String getPlayerSelector() {
-        String selectorForStartSquad = String.join(", ",
-                SELECTOR_FOR_GOALKEAPER,
-                SELECTOR_FOR_DEFENDER,
-                SELECTOR_FOR_MIDFIELDER,
-                SELECTOR_FOR_OFFENDER
-        );
-
         int filterType = getEnteredNumber(DESCRIPTION_FOR_CHOOSE_PLAYER_SELECTOR, 1, 5);
 
         return switch (filterType) {
@@ -158,45 +157,44 @@ public class Utils {
                         ✅ Your choice - All players!
                         ℹ️  Includes all players regardless of status.
                         """);
-                yield String.join(", ",
-                        PLAYER_SELECTOR_FOR_100PC_CHANCE,
-                        PLAYER_SELECTOR_FOR_75PC_CHANCE,
-                        PLAYER_SELECTOR_FOR_50PC_CHANCE,
-                        PLAYER_SELECTOR_FOR_25PC_CHANCE,
-                        PLAYER_SELECTOR_FOR_0PC_CHANCE
-                );
+                yield ALL_PLAYERS_SELECTOR;
             }
             case 2 -> {
+                System.out.println("""
+                        ✅ Your choice - START SQUAD!
+                        ℹ️  Collect 11 players from start squad.
+                        """);
+                yield String.join(", ",
+                        GOALKEAPER_SELECTOR,
+                        DEFENDER_SELECTOR,
+                        MIDFIELDER_SELECTOR,
+                        OFFENDER_SELECTOR
+                );
+            }
+            case 3 -> {
+                System.out.println("""
+                        ✅ Your choice - CAPTAIN!
+                        ℹ️  Collect players with CAPTAIN role.
+                        """);
+                yield filterSelectorByChild(ALL_PLAYERS_SELECTOR, CAPTAIN_ICON_SELECTOR);
+            }
+            case 4 -> {
+                System.out.println("""
+                        ✅ Your choice - BENCH!
+                        ℹ️  Collect 4 players from bench.
+                        """);
+                yield BENCH_SELECTOR;
+            }
+            case 5 -> {
                 System.out.println("""
                         ✅ Your choice - Doubtful, unlikely or unavailable to play (0-50%)!
                         ℹ️  Questionable or unavailable players.
                         """);
                 yield String.join(", ",
-                        PLAYER_SELECTOR_FOR_50PC_CHANCE,
-                        PLAYER_SELECTOR_FOR_25PC_CHANCE,
-                        PLAYER_SELECTOR_FOR_0PC_CHANCE
+                        filterSelectorByChild(ALL_PLAYERS_SELECTOR, FOR_50PC_PLAYER_SELECTOR),
+                        filterSelectorByChild(ALL_PLAYERS_SELECTOR, FOR_25PC_PLAYER_SELECTOR),
+                        filterSelectorByChild(ALL_PLAYERS_SELECTOR, FOR_0PC_PLAYER_SELECTOR)
                 );
-            }
-            case 3 -> {
-                System.out.println("""
-                        ✅ Your choice - START SQUAD!
-                        ℹ️  Collect 11 players from start squad.
-                        """);
-                yield getSelectorForName(String.format(":is(%s)",selectorForStartSquad));
-            }
-            case 4 -> {
-                System.out.println("""
-                        ✅ Your choice - CAPTAIN!
-                        ℹ️  Collect players with CAPTAIN role.
-                        """);
-                yield getSelectorForName(String.format(":is(%s):has(%s)",selectorForStartSquad, SELECTOR_FOR_CAPTAIN_ICON));
-            }
-            case 5 -> {
-                System.out.println("""
-                        ✅ Your choice - BENCH!1
-                        ℹ️  Collect 4 players from bench.
-                        """);
-                yield SELECTOR_FOR_BENCH + " >> " + SELECTOR_FOR_NAME;
             }
             default -> throw new IllegalArgumentException("Unknown filter type: " + filterType);
         };
@@ -231,6 +229,7 @@ public class Utils {
         Map<String, Integer> players = new ConcurrentHashMap<>();
         AtomicInteger counter = new AtomicInteger(0);
         int total = teamLinks.size();
+        String playerNameSelector = getSelectorChild(playerSelector, NAME_SELECTOR);
 
         int browserCount = Math.min(5, Runtime.getRuntime().availableProcessors());
         logger.info("⏱️ Using " + browserCount + " browser threads!");
@@ -249,9 +248,9 @@ public class Utils {
                     for (String link : teamSublist) {
                         try {
                             page.navigate(link);
-                            page.locator(SELECTOR_FOR_NAME).last().waitFor();
+                            page.locator(NAME_SELECTOR).last().waitFor();
 
-                            Locator player = page.locator(playerSelector);
+                            Locator player = page.locator(playerNameSelector);
                             List<Locator> teamPlayers = player.all();
 
                             boolean hasPlayer = absentPlayer == null;
