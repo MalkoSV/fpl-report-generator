@@ -1,12 +1,23 @@
 package fpl.mals;
 
-class Player {
+public class Player {
     private String name;
     private int count;
     private int start;
     private int captain;
+    private int score;
 
-    public Player() {
+    public Player(String name, int count, int start, int captain, int score) {
+        this.name = name;
+        this.count = count;
+        this.start = start;
+        this.captain = captain;
+        this.score = score;
+    }
+
+    public Player(String name, int count) {
+        this.name = name;
+        this.count = count;
     }
 
     public String getName() {
@@ -40,4 +51,13 @@ class Player {
     public void setCaptain(int captain) {
         this.captain = captain;
     }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
 }

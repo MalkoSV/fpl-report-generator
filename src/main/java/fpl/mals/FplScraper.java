@@ -3,7 +3,6 @@ package fpl.mals;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public class FplScraper {
@@ -23,13 +22,15 @@ public class FplScraper {
         List<String> allTeamLinks = Utils.getAllTeamLinks(standingsPageCount);
         logger.info("✅ All team links received (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");
 
-        Map<String, Integer> players = Utils.collectPlayers(allTeamLinks, playerSelector, ABSENT_PLAYER);
+        List<Player> players = Utils.collectStats(allTeamLinks, playerSelector);
+//        Map<String, Integer> players = Utils.collectPlayers(allTeamLinks, playerSelector, ABSENT_PLAYER);
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));
         String fileName = "FPL_Teams_top%d(%d_players-%ds_duration)_%s.xlsx".formatted(
                 allTeamLinks.size(), players.size(), (System.currentTimeMillis() - startTime) / 1000, timestamp);
 
-        Utils.saveResultsToExcel(players, fileName, args);
+        OutputUtils.saveResultsToExcel2(players, fileName, args);
+//        OutputUtils.saveResultsToExcel(players, fileName, args);
 
         logger.info("⏱️ Completed in " + (System.currentTimeMillis() - startTime) / 1000 + "s");
         Thread.sleep(3000);

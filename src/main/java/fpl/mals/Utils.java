@@ -6,24 +6,9 @@ import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -57,9 +42,16 @@ public class Utils {
     private static final String DEFENDER_SELECTOR = "._1k6tww13 ._2j6lqn6";
     private static final String MIDFIELDER_SELECTOR = "._1k6tww14 ._2j6lqn6";
     private static final String OFFENDER_SELECTOR = "._1k6tww15 ._2j6lqn6";
+    private static final String START_SQUAD_SELECTOR = String.join(", ",
+            GOALKEAPER_SELECTOR,
+            DEFENDER_SELECTOR,
+            MIDFIELDER_SELECTOR,
+            OFFENDER_SELECTOR
+    );
     private static final String BENCH_SELECTOR = ".tczxyc5";
     private static final String NAME_SELECTOR = "._174gkcl0";
     private static final String CAPTAIN_ICON_SELECTOR = "svg[aria-label='Captain']";
+    private static final String GW_SCORE_SELECTOR = "._63rl0j3._63rl0j0 span:nth-of-type(2)";
 
     private static final String RESET = "\u001B[0m";
     private static final String YELLOW = "\u001B[33m";
@@ -164,12 +156,7 @@ public class Utils {
                         ✅ Your choice - START SQUAD!
                         ℹ️  Collect 11 players from start squad.
                         """);
-                yield String.join(", ",
-                        GOALKEAPER_SELECTOR,
-                        DEFENDER_SELECTOR,
-                        MIDFIELDER_SELECTOR,
-                        OFFENDER_SELECTOR
-                );
+                yield START_SQUAD_SELECTOR;
             }
             case 3 -> {
                 System.out.println("""
@@ -300,64 +287,83 @@ public class Utils {
         return players;
     }
 
-    public static File getOutputDir(String[] args) {
-        String outputDir = Arrays.stream(args)
-                .filter(arg -> arg.startsWith("/output=") || arg.startsWith("--output="))
-                .findFirst()
-                .map(arg -> arg.substring(arg.indexOf('=') + 1).trim())
-                .orElse(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "FPLScraper");
+    public static List<Player> collectStats(List<String> teamLinks, String playerSelector) {
+        System.out.println("🚀 Running in multi-threaded mode by Browser pool...");
 
-        File outDir = new File(outputDir);
-        if (!outDir.exists() && !outDir.mkdirs()) {
-            System.err.println("❌ Cannot create output directory: " + outDir.getAbsolutePath());
+        AtomicInteger counter = new AtomicInteger(0);
+        int total = teamLinks.size();
+
+        int browserCount = Math.min(5, Runtime.getRuntime().availableProcessors());
+        logger.info("⏱️ Using " + browserCount + " browser threads!");
+
+        ExecutorService executorServicePool = Executors.newFixedThreadPool(browserCount);
+        List<List<String>> partitions = partition(teamLinks, browserCount);
+
+        List<CompletableFuture<List<Player>>> tasks = new ArrayList<>();
+
+        for (var teamSublist : partitions) {
+            CompletableFuture<List<Player>> task = CompletableFuture.supplyAsync(() -> {
+                List<Player> localList = new ArrayList<>();
+
+                try (Playwright playwright = Playwright.create();
+                     Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+                     BrowserContext context = browser.newContext())
+                {
+                    Page page = context.newPage();
+                    for (String link : teamSublist) {
+                        try {
+                            page.navigate(link);
+                            page.locator(NAME_SELECTOR).last().waitFor();
+
+                            Locator player = page.locator(playerSelector);
+                            List<Locator> teamPlayers = player.all();
+
+                            for (Locator el : teamPlayers) {
+                                String name = el.locator(NAME_SELECTOR).innerText().trim();
+                                boolean hasCaptain = el.locator(CAPTAIN_ICON_SELECTOR).count() > 0;
+                                boolean hasStart = el.locator(START_SQUAD_SELECTOR).count() > 0;
+                                int score = Integer.parseInt(el.locator(GW_SCORE_SELECTOR).innerText());
+                                Player currentPlayer = new Player(name, 1);
+                                if (hasStart) {
+                                    currentPlayer.setStart(1);
+                                }
+                                if (hasCaptain) {
+                                    currentPlayer.setCaptain(1);
+                                }
+
+                                localList.add(currentPlayer);
+                            }
+
+                            int done = counter.incrementAndGet();
+                            System.out.printf("✅ %d players, [%d/%d] %s%n", teamPlayers.size(), done, total, link);
+                        } catch (Exception e) {
+                            logger.warning("⚠️ Error on " + link + ": " + e.getMessage());
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.severe("❌ Browser cluster thread failed: " + e.getMessage());
+                }
+                return localList;
+            }, executorServicePool);
+
+            tasks.add(task);
         }
 
-        return outDir;
-    }
+        List<Player> allPlayers = tasks.stream()
+                .map(CompletableFuture::join)
+                .flatMap(List::stream)
+                .toList();
 
-    public static void saveResultsToExcel(Map<String, Integer> players, String fileName, String[] args) {
-        File file = new File(getOutputDir(args), fileName);
-        List<Map.Entry<String, Integer>> sortedPlayers = players.entrySet().stream()
-                .sorted(Comparator
-                        .comparing(Map.Entry<String, Integer>::getValue).reversed()
-                        .thenComparing(Map.Entry::getKey)
-                ).toList();
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Players");
-            CellStyle headerStyle = workbook.createCellStyle();
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerStyle.setFont(headerFont);
-            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            headerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-            Row header = sheet.createRow(0);
-
-            Cell headerCell0 = header.createCell(0);
-            headerCell0.setCellValue("Name");
-            headerCell0.setCellStyle(headerStyle);
-
-            Cell headerCell1 = header.createCell(1);
-            headerCell1.setCellValue("Count");
-            headerCell1.setCellStyle(headerStyle);
-
-            int rowNum = 1;
-            for (var entry : sortedPlayers) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(entry.getKey());
-                row.createCell(1).setCellValue(entry.getValue());
-            }
-
-            sheet.autoSizeColumn(0);
-            sheet.autoSizeColumn(1);
-
-            try (FileOutputStream fileOut = new FileOutputStream(file)) {
-                workbook.write(fileOut);
-            }
-        } catch (IOException e) {
-            logger.severe("❌ Failed to save Excel file: " + e.getMessage());
+        executorServicePool.shutdown();
+        try {
+            executorServicePool.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            executorServicePool.shutdownNow();
         }
-        logger.info("💾 Excel file saved successfully: " + file.getAbsolutePath());
+
+        List<Player> mergedPlayers = PlayerUtils.mergePlayers(allPlayers);
+        System.out.printf("📊 Found %d unique players%n", mergedPlayers.size());
+
+        return mergedPlayers;
     }
 }
