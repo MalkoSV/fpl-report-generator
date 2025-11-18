@@ -6,6 +6,7 @@ import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.options.WaitUntilState;
 import fpl.mals.Player;
 import fpl.mals.Position;
 import fpl.mals.Team;
@@ -91,8 +92,8 @@ public class Utils {
                     Page page = context.newPage();
                     for (String link : teamSublist) {
                         try {
-                            page.navigate(link);
-                            page.locator(SelectorUtils.NAME_SELECTOR).last().waitFor();
+                            page.navigate(link, new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
+                            page.waitForSelector(SelectorUtils.NAME_SELECTOR);
 
                             boolean hasCaptain = false;
                             boolean hasVice = false;
@@ -188,8 +189,8 @@ public class Utils {
                         try {
                             long startTime = System.currentTimeMillis();
 
-                            page.navigate(link);
-                            page.locator(SelectorUtils.NAME_SELECTOR).last().waitFor();
+                            page.navigate(link, new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
+                            page.waitForSelector(SelectorUtils.NAME_SELECTOR);
 
                             boolean foundCaptain = false;
                             boolean foundVice = false;
@@ -294,9 +295,6 @@ public class Utils {
             executorServicePool.shutdownNow();
             Thread.currentThread().interrupt();
         }
-
-//        List<Player> mergedPlayers = PlayerUtils.mergePlayers(allTeamsList);
-//        System.out.printf("📊 Found %d unique players%n", mergedPlayers.size());
 
         return allTeamsList;
     }
