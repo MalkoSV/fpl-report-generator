@@ -7,19 +7,6 @@ import java.util.List;
 
 public class TeamUtils {
 
-    public static final String JS_FOR_TEAM_PAGE_SCRAPING_LIGHT = """
-            (
-                (
-                    teamNameSelector, chipSelector
-                ) => {
-                    return {
-                        teamName: document.querySelector(teamNameSelector)?.innerText || '',
-                        chip    : document.querySelector(chipSelector)?.innerText || '',
-                    };
-                }
-            )
-            """;
-
     public static final String JS_FOR_TEAM_PAGE_SCRAPING = """
             (            
                 (
@@ -28,7 +15,6 @@ public class TeamUtils {
                     teamNameSelector, teamPositionSelector, tripleCaptainText, benchBoostText, freeHitText, wildcardText
                 ) => {
                         const findText = (text) => [...document.querySelectorAll('*')].some(el => el.innerText && el.innerText.trim() === text);
-            
                         const positions = {
                             GOALKEEPER: goalkeeperSelector,
                             DEFENDER:   defenderSelector,
@@ -36,7 +22,6 @@ public class TeamUtils {
                             OFFENDER:   offenderSelector,
                             BENCH:      benchSelector
                         };
-            
                         const playersByPosition = {};
                         for (const [pos, selector] of Object.entries(positions)) {
                             const elements = selector ? document.querySelectorAll(selector) : [];

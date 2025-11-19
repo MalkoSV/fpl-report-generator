@@ -196,10 +196,25 @@ public class Utils {
                             boolean foundVice = false;
 
                             String teamName = page.locator(SelectorUtils.TEAM_NAME_SELECTOR).innerText();
-                            boolean hasTripleCaptain = page.getByText(SelectorUtils.TRIPLE_CAPTAIN).count() > 0;
-                            boolean hasBenchBoost = page.getByText(SelectorUtils.BENCH_BOOST).count() > 0;
-                            int freeHit = page.getByText(SelectorUtils.FREE_HIT).count();
-                            int wildcard = page.getByText(SelectorUtils.WILDCARD).count();
+
+                            Locator chip = page.locator(SelectorUtils.CHIP_SELECTOR);
+                            boolean hasBenchBoost = false;
+                            boolean hasTripleCaptain = false;
+                            int freeHit = 0;
+                            int wildcard = 0;
+
+                            if (chip.count() > 0) {
+                                hasBenchBoost = page.getByText(SelectorUtils.BENCH_BOOST).count() > 0;
+                                if (!hasBenchBoost) {
+                                    freeHit = page.getByText(SelectorUtils.FREE_HIT).count();
+                                    if (freeHit == 0) {
+                                        hasTripleCaptain = page.getByText(SelectorUtils.TRIPLE_CAPTAIN).count() > 0;
+                                        if (!hasTripleCaptain) {
+                                            wildcard = 1;
+                                        }
+                                    }
+                                }
+                            }
 
                             Map<Position, List<Player>> playersByPosition = new EnumMap<>(Position.class);
                             for (Position pos : Position.values()) {
@@ -297,7 +312,6 @@ public class Utils {
         return allTeamList;
     }
 
-    @SuppressWarnings("unchecked")
     public static List<Team> collectStatsLightJS(List<String> teamLinks) {
 
         String teamNameSelector     = SelectorUtils.TEAM_NAME_SELECTOR;
@@ -349,26 +363,11 @@ public class Utils {
                             ).toString();
 
                             switch (chip) {
-                                case "" -> {
-                                    break;
-                                }
-                                case SelectorUtils.TRIPLE_CAPTAIN -> {
-                                    hasChipTripleCaptain = true;
-                                    break;
-                                }
-                                case SelectorUtils.BENCH_BOOST -> {
-                                    hasChipBenchBoost = true;
-                                    break;
-                                }
-                                case SelectorUtils.FREE_HIT -> {
-                                    freeHit = 1;
-                                    break;
-                                }
-                                case SelectorUtils.WILDCARD -> {
-                                    wildcard = 1;
-                                    break;
-                                }
-                                default -> {}
+                                case "" -> {}
+                                case SelectorUtils.TRIPLE_CAPTAIN -> hasChipTripleCaptain = true;
+                                case SelectorUtils.BENCH_BOOST -> hasChipBenchBoost = true;
+                                case SelectorUtils.FREE_HIT -> freeHit = 1;
+                                case SelectorUtils.WILDCARD -> wildcard = 1;
                             }
 
                             Map<Position, List<Player>> playersByPosition = new EnumMap<>(Position.class);
