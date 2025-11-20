@@ -40,7 +40,11 @@ public class Utils {
 
 
     public static int getEnteredPageCount() {
-        return InputUtils.getEnteredNumber(InputUtils.DESCRIPTION_FOR_ENTER_PAGE_NUMBER, 0, 20);
+        int count = InputUtils.getEnteredNumber(InputUtils.DESCRIPTION_FOR_ENTER_PAGE_NUMBER, 0, 20);
+        System.out.printf("✅ Your choice - %d%n", count);
+        System.out.printf("ℹ️  The first %d teams will be reviewed.%n%n", count * 50);
+
+        return count;
     }
 
     public static List<String> getAllTeamLinks(int pageCount) {
@@ -58,11 +62,10 @@ public class Utils {
     }
 
     public static List<String> getTeamLinks(String url, Page page) {
-            page.navigate(url);
-            Locator links = page.locator(SelectorUtils.RECORD_LINK_SELECTOR);
-            links.first().waitFor();
+            page.navigate(url, new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
+            page.waitForSelector(SelectorUtils.RECORD_LINK_SELECTOR);
 
-            return links.all().stream()
+            return page.locator(SelectorUtils.RECORD_LINK_SELECTOR).all().stream()
                     .map(el -> SelectorUtils.getFullUrl(el.getAttribute("href")))
                     .toList();
     }
@@ -204,11 +207,11 @@ public class Utils {
                             int wildcard = 0;
 
                             if (chip.count() > 0) {
-                                hasBenchBoost = page.getByText(SelectorUtils.BENCH_BOOST).count() > 0;
+                                hasBenchBoost = chip.getByText(SelectorUtils.BENCH_BOOST).count() > 0;
                                 if (!hasBenchBoost) {
-                                    freeHit = page.getByText(SelectorUtils.FREE_HIT).count();
+                                    freeHit = chip.getByText(SelectorUtils.FREE_HIT).count();
                                     if (freeHit == 0) {
-                                        hasTripleCaptain = page.getByText(SelectorUtils.TRIPLE_CAPTAIN).count() > 0;
+                                        hasTripleCaptain = chip.getByText(SelectorUtils.TRIPLE_CAPTAIN).count() > 0;
                                         if (!hasTripleCaptain) {
                                             wildcard = 1;
                                         }

@@ -9,8 +9,6 @@ public class SelectorUtils {
     public static final String RECORD_LINK_SELECTOR = "a._1jqkqxq4";
 
     public static final String TEAM_NAME_SELECTOR = "#page-title";
-    public static final String TEAM_POSITION_SELECTOR = "h4:has-text(\"Overall rank\") + *";
-
     public static final String CHIP_SELECTOR = "div._18v1mulc";
     public static final String TRIPLE_CAPTAIN = "Triple Captain";
     public static final String BENCH_BOOST = "Bench Boost";

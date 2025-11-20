@@ -48,6 +48,41 @@ public class TeamUtils {
                 )
             """;
 
+    public static final String JS_FOR_PLAYERS_SCRAPING = """
+            (            
+                (
+                    goalkeeperSelector, defenderSelector, midfielderSelector, offenderSelector, benchSelector,
+                    nameSelector, scoreSelector, captainIconSelector, viceIconSelector, startSquadSelector, hasTripleCaptain
+                ) => {
+                        const findText = (text) => [...document.querySelectorAll('*')].some(el => el.innerText && el.innerText.trim() === text);
+                        const positions = {
+                            GOALKEEPER: goalkeeperSelector,
+                            DEFENDER:   defenderSelector,
+                            MIDFIELDER: midfielderSelector,
+                            OFFENDER:   offenderSelector,
+                            BENCH:      benchSelector
+                        };
+                        const playersByPosition = {};
+                        for (const [pos, selector] of Object.entries(positions)) {
+                            const elements = selector ? document.querySelectorAll(selector) : [];
+                            playersByPosition[pos] = [...elements].map(p => ({
+                                    name:       p.querySelector(nameSelector)?.innerText?.trim() || '',
+                                    score:      parseInt(p.querySelector(scoreSelector)?.innerText) || 0,
+                                    isCaptain:  !!p.querySelector(captainIconSelector),
+                                    isTripleCaptain: !!p.querySelector(captainIconSelector) && hasTripleCaptain,
+                                    isVice:     !!p.querySelector(viceIconSelector),
+                                    isStarting: !!p.querySelector(startSquadSelector)
+                                }));
+                        }
+            
+                        return {
+                            playersByPosition: playersByPosition
+                        };
+                    }
+                )
+            """;
+
+
     public static TeamSummary calculateSummary(List<Team> teams) {
         return new TeamSummary(
                 teams.size(),
