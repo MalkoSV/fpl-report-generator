@@ -3,6 +3,7 @@ package fpl.mals;
 import fpl.mals.utils.OutputUtils;
 import fpl.mals.utils.SelectorUtils;
 import fpl.mals.utils.Utils;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ public class FplScraper {
 
     public static void main(String[] args) throws InterruptedException {
         System.setProperty("PLAYWRIGHT_BROWSERS_PATH", "browsers");
+        AnsiConsole.systemInstall();
 
         int standingsPageCount = Utils.getEnteredPageCount();
         Utils.terminateProgramIfNeeded(standingsPageCount);
@@ -42,6 +44,7 @@ public class FplScraper {
         }
 
         logger.info("⏱️ Completed in " + (System.currentTimeMillis() - startTime) / 1000 + "s");
+        AnsiConsole.systemUninstall();
         Thread.sleep(3000);
     }
 }
