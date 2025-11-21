@@ -122,10 +122,11 @@ public class SelectorUtils {
     }
 
     public static int getAvailability(Locator el) {
-        if (el.locator(FOR_100PC_PLAYER_SELECTOR).count() > 0) return 100;
-        if (el.locator(FOR_75PC_PLAYER_SELECTOR).count() > 0) return 75;
-        if (el.locator(FOR_50PC_PLAYER_SELECTOR).count() > 0) return 50;
-        if (el.locator(FOR_25PC_PLAYER_SELECTOR).count() > 0) return 25;
+        if (el.locator(FOR_100PC_PLAYER_SELECTOR).first().isVisible()) return 100;
+        if (el.locator(FOR_75PC_PLAYER_SELECTOR).first().isVisible()) return 75;
+        if (el.locator(FOR_50PC_PLAYER_SELECTOR).first().isVisible()) return 50;
+        if (el.locator(FOR_25PC_PLAYER_SELECTOR).first().isVisible()) return 25;
+
         return 0;
     }
 }

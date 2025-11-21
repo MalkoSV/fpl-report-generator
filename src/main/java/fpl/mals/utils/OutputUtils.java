@@ -121,7 +121,7 @@ public class OutputUtils {
         int columnCount = columnHeaders.size();
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Players");
+            Sheet sheet = workbook.createSheet("All players");
             CellStyle headerStyle = workbook.createCellStyle();
             Font headerFont = workbook.createFont();
             headerFont.setBold(true);
@@ -157,61 +157,40 @@ public class OutputUtils {
             int column1 = columnCount + 1;
             int column2 = columnCount + 2;
 
-            Row row = sheet.getRow(1);
-            Cell cell = row.createCell(column1);
-            cell.setCellValue("Teams");
-            cell.setCellStyle(headerStyle);
-            cell = row.createCell(column2);
-            cell.setCellValue(summary.count());
+            Object[][] rows = {
+                    {"Teams",          summary.count()},
+                    {"Players",        summary.players().size()},
+                    {"Triple Captain", summary.tripleCaptain()},
+                    {"Wildcard",       summary.wildcard()},
+                    {"Bench Boost",    summary.benchBoost()},
+                    {"Free Hit",       summary.freeHit()}
+            };
 
-            row = sheet.getRow(2);
-            cell = row.createCell(column1);
-            cell.setCellValue("Players");
-            cell.setCellStyle(headerStyle);
-            cell = row.createCell(column2);
-            cell.setCellValue(summary.players().size());
+            for (int i = 0; i < rows.length; i++) {
+                Row row = sheet.getRow(i + 1);
 
-            row = sheet.getRow(3);
-            cell = row.createCell(column1);
-            cell.setCellValue("Triple Captain");
-            cell.setCellStyle(headerStyle);
-            cell = row.createCell(column2);
-            cell.setCellValue(summary.tripleCaptain());
+                Cell cell1 = row.createCell(column1);
+                cell1.setCellValue((String) rows[i][0]);
+                cell1.setCellStyle(headerStyle);
 
-            row = sheet.getRow(4);
-            cell = row.createCell(column1);
-            cell.setCellValue("Wildcard");
-            cell.setCellStyle(headerStyle);
-            cell = row.createCell(column2);
-            cell.setCellValue(summary.wildcard());
-
-            row = sheet.getRow(5);
-            cell = row.createCell(column1);
-            cell.setCellValue("Bench Boost");
-            cell.setCellStyle(headerStyle);
-            cell = row.createCell(column2);
-            cell.setCellValue(summary.benchBoost());
-
-            row = sheet.getRow(6);
-            cell = row.createCell(column1);
-            cell.setCellValue("Free Hit");
-            cell.setCellStyle(headerStyle);
-            cell = row.createCell(column2);
-            cell.setCellValue(summary.freeHit());
+                Cell cell2 = row.createCell(column2);
+                cell2.setCellValue(((Number) rows[i][1]).doubleValue());
+            }
 
             headerStyle.setAlignment(HorizontalAlignment.CENTER);
             int n = 8;
             for (var entry : formations.entrySet()) {
-                row = sheet.getRow(n);
+                Row row = sheet.getRow(n);
                 if (row == null) {
                     row = sheet.createRow(n);
                 }
+                Cell cell1 = row.createCell(column1);
+                cell1.setCellValue(entry.getKey());
+                cell1.setCellStyle(headerStyle);
+
+                Cell cell2 = row.createCell(column2);
+                cell2.setCellValue(entry.getValue());
                 n++;
-                cell = row.createCell(column1);
-                cell.setCellValue(entry.getKey());
-                cell.setCellStyle(headerStyle);
-                cell = row.createCell(column2);
-                cell.setCellValue(entry.getValue());
             }
 
             for (int i = 0; i < columnCount + 3; i++) {
