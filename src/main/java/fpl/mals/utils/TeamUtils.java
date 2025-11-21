@@ -1,9 +1,9 @@
 package fpl.mals.utils;
 
+import fpl.mals.Player;
 import fpl.mals.Team;
 import fpl.mals.TeamSummary;
 
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +95,7 @@ public class TeamUtils {
                 teams.stream().mapToInt(Team::getWildCard).sum(),
                 teams.stream().mapToInt(Team::getBenchBoost).sum(),
                 teams.stream().mapToInt(Team::getFreeHit).sum(),
-                PlayerUtils.mergePlayers(Utils.getFullPlayerListFromTeams(teams))
+                PlayerUtils.mergePlayers(getFullPlayerList(teams))
         );
     }
 
@@ -106,9 +106,12 @@ public class TeamUtils {
                         t.getMidfielders().size(),
                         t.getOffenders().size()
                 ))
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
+                ))
                 .entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
@@ -116,4 +119,28 @@ public class TeamUtils {
                         LinkedHashMap::new
                 ));
     }
+
+    public static List<Player> getFullPlayerList(List<Team> teams) {
+        return teams.stream()
+                .flatMap(Team::streamPlayers)
+                .toList();
+    }
+
+    public static Map<Long, Long> calculateStartPlayersWithZero(List<Team> teams) {
+        return teams.stream()
+                .map(Team::countStartPlayersWithZero)
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
+                ))
+                .entrySet().stream()
+                .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                                (a,b) -> a,
+                        LinkedHashMap::new
+                ));
+    }
+
 }

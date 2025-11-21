@@ -70,103 +70,6 @@ public class Utils {
                     .toList();
     }
 
-    public static List<Player> collectPlayers(List<String> teamLinks, String playerSelector) {
-        System.out.println("🚀 Running in multi-threaded mode by Browser pool...");
-
-        AtomicInteger counter = new AtomicInteger(0);
-        int total = teamLinks.size();
-
-        int browserCount = Math.min(5, Runtime.getRuntime().availableProcessors());
-        logger.info("⏱️ Using " + browserCount + " browser threads!");
-
-        ExecutorService executorServicePool = Executors.newFixedThreadPool(browserCount);
-        List<List<String>> partitions = partition(teamLinks, browserCount);
-
-        List<CompletableFuture<List<Player>>> tasks = new ArrayList<>();
-
-        for (var teamSublist : partitions) {
-            CompletableFuture<List<Player>> task = CompletableFuture.supplyAsync(() -> {
-                List<Player> localList = new ArrayList<>();
-
-                try (Playwright playwright = Playwright.create();
-                     Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
-                     BrowserContext context = browser.newContext())
-                {
-                    Page page = context.newPage();
-                    for (String link : teamSublist) {
-                        try {
-                            page.navigate(link, new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
-                            page.waitForSelector(SelectorUtils.NAME_SELECTOR);
-
-                            boolean hasCaptain = false;
-                            boolean hasVice = false;
-                            boolean hasTripleCaptain = page.getByText(SelectorUtils.TRIPLE_CAPTAIN).count() > 0;
-                            boolean hasBenchBoost = page.getByText(SelectorUtils.BENCH_BOOST).count() > 0;
-                            Locator player = page.locator(playerSelector);
-                            List<Locator> teamPlayers = player.all();
-
-
-                            for (Locator el : teamPlayers) {
-                                String name = el.locator(SelectorUtils.NAME_SELECTOR).innerText().trim();
-                                int score = Integer.parseInt(el.locator(SelectorUtils.GW_SCORE_SELECTOR).innerText());
-                                Player currentPlayer = new Player(name, 1, score);
-
-                                if (hasBenchBoost || SelectorUtils.hasStartSquad(el)) {
-                                    currentPlayer.setStart(1);
-                                }
-
-                                if (!hasCaptain && SelectorUtils.hasCaptainIcon(el)) {
-                                    hasCaptain = true;
-                                    currentPlayer.setCaptain(1);
-                                    if (hasTripleCaptain) {
-                                        currentPlayer.setTripleCaptain(1);
-                                    }
-                                }
-
-                                if (!hasVice && SelectorUtils.hasViceIcon(el)) {
-                                    hasVice = true;
-                                    currentPlayer.setVice(1);
-                                }
-
-                                localList.add(currentPlayer);
-                            }
-
-                            int done = counter.incrementAndGet();
-                            System.out.printf("✅ %d players, [%d/%d] %s%n", teamPlayers.size(), done, total, link);
-                        } catch (Exception e) {
-                            logger.warning("⚠️ Error on " + link + ": " + e.getMessage());
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.severe("❌ Browser cluster thread failed: " + e.getMessage());
-                }
-                return localList;
-            }, executorServicePool);
-
-            tasks.add(task);
-        }
-
-        List<Player> allPlayers = tasks.stream()
-                .map(CompletableFuture::join)
-                .flatMap(List::stream)
-                .toList();
-
-        executorServicePool.shutdown();
-        try {
-            if (!executorServicePool.awaitTermination(1, TimeUnit.MINUTES)) {
-                executorServicePool.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorServicePool.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
-
-        List<Player> mergedPlayers = PlayerUtils.mergePlayers(allPlayers);
-        System.out.printf("📊 Found %d unique players%n", mergedPlayers.size());
-
-        return mergedPlayers;
-    }
-
     public static List<Team> collectStats(List<String> teamLinks) {
         AtomicInteger counter = new AtomicInteger(0);
         int total = teamLinks.size();
@@ -206,12 +109,12 @@ public class Utils {
                             int freeHit = 0;
                             int wildcard = 0;
 
-                            if (chip.count() > 0) {
-                                hasBenchBoost = chip.getByText(SelectorUtils.BENCH_BOOST).count() > 0;
+                            if (chip.first().isVisible()) {
+                                hasBenchBoost = chip.getByText(SelectorUtils.BENCH_BOOST).first().isVisible();
                                 if (!hasBenchBoost) {
                                     freeHit = chip.getByText(SelectorUtils.FREE_HIT).count();
                                     if (freeHit == 0) {
-                                        hasTripleCaptain = chip.getByText(SelectorUtils.TRIPLE_CAPTAIN).count() > 0;
+                                        hasTripleCaptain = chip.getByText(SelectorUtils.TRIPLE_CAPTAIN).first().isVisible();
                                         if (!hasTripleCaptain) {
                                             wildcard = 1;
                                         }
@@ -315,12 +218,6 @@ public class Utils {
         }
 
         return allTeamList;
-    }
-
-    public static List<Player> getFullPlayerListFromTeams(List<Team> teams) {
-        return teams.stream()
-                .flatMap(Team::streamPlayers)
-                .toList();
     }
 
 }

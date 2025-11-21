@@ -20,7 +20,7 @@ public class PlayerUtils {
                                 p1.getCaptain() + p2.getCaptain(),
                                 p1.getTripleCaptain() + p2.getTripleCaptain(),
                                 p1.getVice() + p2.getVice(),
-                                Math.min(p1.getScore(), p2.getScore()),
+                                Math.min(p1.getPoints(), p2.getPoints()),
                                 p1.getAvailability()
                         )
                 ))
@@ -31,5 +31,41 @@ public class PlayerUtils {
                                 .thenComparing(Player::getName)
                 )
                 .toList();
+    }
+
+    public static List<Player> getOnlyStartPlayers(List<Player> players) {
+        return players.stream()
+                .filter(p -> p.getStart() == p.getCount())
+                .toList();
+    }
+
+    public static List<Player> getOnlyBenchPlayers(List<Player> players) {
+        return players.stream()
+                .filter(p -> p.getStart() == 0)
+                .toList();
+    }
+
+    public static List<Player> getDoubtfulPlayers(List<Player> players) {
+        return players.stream()
+                .filter(p -> p.getAvailability() <= 50)
+                .toList();
+    }
+
+    public static List<Player> getBenchPlayersWithHighPoints(List<Player> players) {
+        return players.stream()
+                .filter(p -> p.getCount() - p.getStart() > 0 && p.getPoints() > 5)
+                .toList();
+    }
+
+    public static List<Player> getPlayersWhoCaptain(List<Player> players) {
+        return players.stream()
+                .filter(p -> p.getCaptain() > 0)
+                .toList();
+    }
+
+    public static long countStartPlayersWithZeroInList(List<Player> players) {
+        return players.stream()
+                .filter(p -> p.getStart() == 0 && p.getPoints() <= 0)
+                .count();
     }
 }

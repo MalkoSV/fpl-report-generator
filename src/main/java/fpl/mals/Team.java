@@ -1,5 +1,7 @@
 package fpl.mals;
 
+import fpl.mals.utils.PlayerUtils;
+
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -85,6 +87,16 @@ public class Team {
                 midfielders,
                 offenders,
                 bench
-        ).flatMap(List::stream);
+                )
+                .flatMap(List::stream);
     }
+
+    public static long countStartPlayersWithZero(Team t) {
+        return PlayerUtils.countStartPlayersWithZeroInList(t.getGoalkeeper())
+                + PlayerUtils.countStartPlayersWithZeroInList(t.getDefenders())
+                + PlayerUtils.countStartPlayersWithZeroInList(t.getMidfielders())
+                + PlayerUtils.countStartPlayersWithZeroInList(t.getOffenders())
+                + PlayerUtils.countStartPlayersWithZeroInList(t.getBench());
+    }
+
 }

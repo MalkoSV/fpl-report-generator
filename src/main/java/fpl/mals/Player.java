@@ -7,7 +7,7 @@ public class Player {
     private int captain;
     private int tripleCaptain;
     private int vice;
-    private final int score;
+    private final int points;
     private int availability;
 
     public Player(String name, int count, int start, int captain, int tripleCaptain, int vice, int score, int availability) {
@@ -17,14 +17,14 @@ public class Player {
         this.captain = captain;
         this.tripleCaptain = tripleCaptain;
         this.vice = vice;
-        this.score = score;
+        this.points = score;
         this.availability = availability;
     }
 
-    public Player(String name, int count, int score) {
+    public Player(String name, int count, int points) {
         this.name = name;
         this.count = count;
-        this.score = score;
+        this.points = points;
     }
 
     public String getName() {
@@ -51,8 +51,8 @@ public class Player {
         return vice;
     }
 
-    public int getScore() {
-        return score;
+    public int getPoints() {
+        return points;
     }
 
     public int getAvailability() {

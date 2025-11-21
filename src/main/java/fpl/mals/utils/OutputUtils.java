@@ -26,6 +26,19 @@ public class OutputUtils {
 
     private static final Logger logger = Logger.getLogger(OutputUtils.class.getName());
 
+    public static final List<String> COLUMNHEADERS = List.of(
+            "Name",
+            "Count",
+            "Start",
+            "Captain",
+            "Triple",
+            "Vice",
+            "Bench",
+            "Availability",
+            "Points"
+    );
+
+
     public static File getOutputDir(String[] args) {
         String outputDir = Arrays.stream(args)
                 .filter(arg -> arg.startsWith("/output=") || arg.startsWith("--output="))
@@ -41,56 +54,18 @@ public class OutputUtils {
         return outDir;
     }
 
-    public static void saveResultsToExcel(List<Player> players, String fileName, String[] args) {
+    public static void exportResultsToExcel(List<Team> teams, String fileName, String[] args) {
+        TeamSummary summary = TeamUtils.calculateSummary(teams);
         File file = new File(getOutputDir(args), fileName);
-        List<String> columnHeader = List.of(
-                "Name",
-                "Count",
-                "Start",
-                "Captain",
-                "Triple",
-                "Vice",
-                "Bench",
-                "Score"
-        );
-        int columnCount = columnHeader.size();
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Players");
-            CellStyle headerStyle = workbook.createCellStyle();
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerStyle.setFont(headerFont);
-            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            headerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-            Row header = sheet.createRow(0);
-            Cell headerCell;
-
-            for (int i = 0; i < columnCount; i++) {
-                headerCell = header.createCell(i);
-                headerCell.setCellValue(columnHeader.get(i));
-                headerCell.setCellStyle(headerStyle);
-
-            }
-
-            int rowNum = 1;
-            for (var entry : players) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(entry.getName());
-                row.createCell(1).setCellValue(entry.getCount());
-                row.createCell(2).setCellValue(entry.getStart());
-                row.createCell(3).setCellValue(entry.getCaptain());
-                row.createCell(4).setCellValue(entry.getTripleCaptain());
-                row.createCell(5).setCellValue(entry.getVice());
-                row.createCell(6).setCellValue(entry.getCount() - entry.getStart());
-                row.createCell(7).setCellValue(entry.getScore());
-            }
-
-            for (int i = 0; i < columnCount ; i++) {
-                sheet.autoSizeColumn(i);
-            }
+            Sheet allPlayersSheet = createPlayersSheet(workbook, summary.players(), "All players");
+            createPlayersSheet(workbook, PlayerUtils.getOnlyStartPlayers(summary.players()), "Only start");
+            createPlayersSheet(workbook, PlayerUtils.getOnlyBenchPlayers(summary.players()), "Only bench");
+            createPlayersSheet(workbook, PlayerUtils.getPlayersWhoCaptain(summary.players()), "Captain");
+            createPlayersSheet(workbook, PlayerUtils.getDoubtfulPlayers(summary.players()), "Doubtful");
+            createPlayersSheet(workbook, PlayerUtils.getBenchPlayersWithHighPoints(summary.players()), "Bench (>5 points)");
+            addSummaryInformation(workbook, allPlayersSheet, teams, summary);
 
             try (FileOutputStream fileOut = new FileOutputStream(file)) {
                 workbook.write(fileOut);
@@ -101,109 +76,113 @@ public class OutputUtils {
         logger.info("💾 Excel file saved successfully: " + file.getAbsolutePath());
     }
 
-    public static void saveAllResultsToExcel(List<Team> teams, String fileName, String[] args) {
-        TeamSummary summary = TeamUtils.calculateSummary(teams);
-        Map<String, Long> formations = TeamUtils.calculateFormationType(teams);
+    public static Sheet createPlayersSheet(Workbook workbook, List<Player> players, String sheetName) {
+        Sheet sheet = workbook.createSheet(sheetName);
+        CellStyle headerStyle = getHeaderStyle(workbook);
 
-        File file = new File(getOutputDir(args), fileName);
-        List<String> columnHeaders = List.of(
-                "Name",
-                "Count",
-                "Start",
-                "Captain",
-                "Triple",
-                "Vice",
-                "Bench",
-                "Availability",
-                "Score"
-        );
-
-        int columnCount = columnHeaders.size();
-
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("All players");
-            CellStyle headerStyle = workbook.createCellStyle();
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerStyle.setFont(headerFont);
-            headerStyle.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
-            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            headerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-            Row header = sheet.createRow(0);
-
-            for (int i = 0; i < columnCount; i++) {
-                Cell headerCell = header.createCell(i);
-                headerCell.setCellValue(columnHeaders.get(i));
-                headerCell.setCellStyle(headerStyle);
-
-            }
-
-            int rowNum = 1;
-            for (var entry : summary.players()) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(entry.getName());
-                row.createCell(1).setCellValue(entry.getCount());
-                row.createCell(2).setCellValue(entry.getStart());
-                row.createCell(3).setCellValue(entry.getCaptain());
-                row.createCell(4).setCellValue(entry.getTripleCaptain());
-                row.createCell(5).setCellValue(entry.getVice());
-                row.createCell(6).setCellValue(entry.getCount() - entry.getStart());
-                row.createCell(7).setCellValue(entry.getAvailability());
-                row.createCell(8).setCellValue(entry.getScore());
-            }
-
-            headerStyle.setAlignment(HorizontalAlignment.LEFT);
-            int column1 = columnCount + 1;
-            int column2 = columnCount + 2;
-
-            Object[][] rows = {
-                    {"Teams",          summary.count()},
-                    {"Players",        summary.players().size()},
-                    {"Triple Captain", summary.tripleCaptain()},
-                    {"Wildcard",       summary.wildcard()},
-                    {"Bench Boost",    summary.benchBoost()},
-                    {"Free Hit",       summary.freeHit()}
-            };
-
-            for (int i = 0; i < rows.length; i++) {
-                Row row = sheet.getRow(i + 1);
-
-                Cell cell1 = row.createCell(column1);
-                cell1.setCellValue((String) rows[i][0]);
-                cell1.setCellStyle(headerStyle);
-
-                Cell cell2 = row.createCell(column2);
-                cell2.setCellValue(((Number) rows[i][1]).doubleValue());
-            }
-
-            headerStyle.setAlignment(HorizontalAlignment.CENTER);
-            int n = 8;
-            for (var entry : formations.entrySet()) {
-                Row row = sheet.getRow(n);
-                if (row == null) {
-                    row = sheet.createRow(n);
-                }
-                Cell cell1 = row.createCell(column1);
-                cell1.setCellValue(entry.getKey());
-                cell1.setCellStyle(headerStyle);
-
-                Cell cell2 = row.createCell(column2);
-                cell2.setCellValue(entry.getValue());
-                n++;
-            }
-
-            for (int i = 0; i < columnCount + 3; i++) {
-                sheet.autoSizeColumn(i);
-            }
-
-            try (FileOutputStream fileOut = new FileOutputStream(file)) {
-                workbook.write(fileOut);
-            }
-        } catch (IOException e) {
-            logger.severe("❌ Failed to save Excel file: " + e.getMessage());
+        Row header = sheet.createRow(0);
+        for (int i = 0; i < COLUMNHEADERS.size(); i++) {
+            Cell headerCell = header.createCell(i);
+            headerCell.setCellValue(COLUMNHEADERS.get(i));
+            headerCell.setCellStyle(headerStyle);
+            sheet.autoSizeColumn(i);
         }
-        logger.info("💾 Excel file saved successfully: " + file.getAbsolutePath());
+
+        int rowNum = 1;
+        for (var entry : players) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(entry.getName());
+            row.createCell(1).setCellValue(entry.getCount());
+            row.createCell(2).setCellValue(entry.getStart());
+            row.createCell(3).setCellValue(entry.getCaptain());
+            row.createCell(4).setCellValue(entry.getTripleCaptain());
+            row.createCell(5).setCellValue(entry.getVice());
+            row.createCell(6).setCellValue(entry.getCount() - entry.getStart());
+            row.createCell(7).setCellValue(entry.getAvailability());
+            row.createCell(8).setCellValue(entry.getPoints());
+        }
+        sheet.autoSizeColumn(0);
+
+        return sheet;
+    }
+
+    public static void addSummaryInformation(Workbook workbook, Sheet sheetName, List<Team> teams, TeamSummary summary) {
+        Map<String, Long> formations = TeamUtils.calculateFormationType(teams);
+        Map<Long, Long> countWithZero = TeamUtils.calculateStartPlayersWithZero(teams);
+        int columnCount = COLUMNHEADERS.size();
+        int column1 = columnCount + 1;
+        int column2 = columnCount + 2;
+
+        Object[][] rows = {
+                {"Teams",          summary.count()},
+                {"Players",        summary.players().size()},
+                {"Triple Captain", summary.tripleCaptain()},
+                {"Wildcard",       summary.wildcard()},
+                {"Bench Boost",    summary.benchBoost()},
+                {"Free Hit",       summary.freeHit()}
+        };
+
+        CellStyle headerStyle = getHeaderStyle(workbook);
+        headerStyle.setAlignment(HorizontalAlignment.LEFT);
+        for (int i = 0; i < rows.length; i++) {
+            Row row = sheetName.getRow(i + 1);
+
+            Cell cell1 = row.createCell(column1);
+            cell1.setCellValue((String) rows[i][0]);
+            cell1.setCellStyle(headerStyle);
+
+            Cell cell2 = row.createCell(column2);
+            cell2.setCellValue(((Number) rows[i][1]).doubleValue());
+        }
+
+        int n = rows.length + 2;
+        for (var entry : formations.entrySet()) {
+            Row row = sheetName.getRow(n);
+            if (row == null) {
+                row = sheetName.createRow(n);
+            }
+            Cell cell1 = row.createCell(column1);
+            cell1.setCellValue(entry.getKey());
+            cell1.setCellStyle(headerStyle);
+
+            Cell cell2 = row.createCell(column2);
+            cell2.setCellValue(entry.getValue());
+            n++;
+        }
+        sheetName.autoSizeColumn(column1);
+
+        int column3 = column2 + 2;
+        int column4 = column2 + 3;
+
+        Cell headerCell1 = sheetName.getRow(0).createCell(column3);
+        headerCell1.setCellValue("0 pts players");
+        headerCell1.setCellStyle(headerStyle);
+        sheetName.autoSizeColumn(column3);
+
+        Cell headerCell2 = sheetName.getRow(0).createCell(column4);
+        headerCell2.setCellValue("Teams");
+        headerCell2.setCellStyle(headerStyle);
+        sheetName.autoSizeColumn(column4);
+
+        int rowNum = 1;
+        for (var entry : countWithZero.entrySet()) {
+            Row row = sheetName.getRow(rowNum++);
+            row.createCell(column3).setCellValue(entry.getKey());
+            row.createCell(column4).setCellValue(entry.getValue());
+        }
+
+    }
+
+    public static CellStyle getHeaderStyle(Workbook workbook) {
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        return headerStyle;
     }
 
 }
