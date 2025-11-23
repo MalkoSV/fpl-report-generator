@@ -40,28 +40,29 @@ public class Utils {
 
 
     public static int getEnteredPageCount() {
-        int count = InputUtils.getEnteredNumber(InputUtils.DESCRIPTION_FOR_ENTER_PAGE_NUMBER, 0, 20);
+        int count = InputUtils.getEnteredNumber(InputUtils.DESCRIPTION_FOR_ENTER_PAGE_NUMBER, 0, 22);
         System.out.printf("✅ Your choice - %d%n", count);
-        System.out.printf("ℹ️  The first %d teams will be reviewed.%n%n", count * 50);
 
         return count;
     }
 
-    public static List<String> getAllTeamLinks(int pageCount) {
+    public static List<String> collectAllTeamLinks(int pageCount) {
         try (Playwright playwright = Playwright.create();
              Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
              BrowserContext context = browser.newContext();
              Page page = context.newPage())
         {
-        return IntStream.rangeClosed(1, pageCount)
-                .mapToObj(SelectorUtils::getStandingsPageUrl)
-                .map(url -> Utils.getTeamLinks(url, page))
-                .flatMap(Collection::stream)
-                .toList();
+            int n = pageCount <= 20 ? pageCount : 1;
+
+            return IntStream.rangeClosed(1, n)
+                    .mapToObj(i -> SelectorUtils.getStandingsPageUrl(i, pageCount))
+                    .map(url -> Utils.getTeamLinksFromPage(url, page))
+                    .flatMap(Collection::stream)
+                    .toList();
         }
     }
 
-    public static List<String> getTeamLinks(String url, Page page) {
+    public static List<String> getTeamLinksFromPage(String url, Page page) {
             page.navigate(url, new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
             page.waitForSelector(SelectorUtils.RECORD_LINK_SELECTOR);
 
@@ -144,8 +145,13 @@ public class Utils {
                                 List<Locator> teamPlayers = player.all();
                                 for (Locator el : teamPlayers) {
                                     String name = el.locator(SelectorUtils.NAME_SELECTOR).innerText().trim();
-                                    int score = Integer.parseInt(el.locator(SelectorUtils.GW_SCORE_SELECTOR).innerText());
-                                    Player currentPlayer = new Player(name, 1, score);
+                                    Locator pointsLocator = el.locator(SelectorUtils.GW_SCORE_SELECTOR);
+                                    int points = pointsLocator.isVisible() ? Integer.parseInt(pointsLocator.innerText()) : 0;
+
+                                    if (!pointsLocator.isVisible()) {
+                                        System.out.println(name + " - points=" + points);
+                                    }
+                                    Player currentPlayer = new Player(name, 1, points);
 
                                     if (hasBenchBoost || SelectorUtils.hasStartSquad(el)) {
                                         currentPlayer.setStart(1);

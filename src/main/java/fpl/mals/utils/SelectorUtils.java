@@ -6,6 +6,8 @@ public class SelectorUtils {
 
     public static final String BASE_URL = "https://fantasy.premierleague.com";
     public static final String BASE_OVERALL_LEAGUE_PATH = "/leagues/314/standings/c";
+    public static final String BASE_MALS_LEAGUE_PATH = "/leagues/1032011/standings/c";
+    public static final String BASE_PROGNOZILLA_LEAGUE_PATH = "/leagues/1031449/standings/c";
     public static final String RECORD_LINK_SELECTOR = "a._1jqkqxq4";
 
     public static final String TEAM_NAME_SELECTOR = "#page-title";
@@ -45,8 +47,27 @@ public class SelectorUtils {
         return BASE_URL + urlEnd;
     }
 
-    public static String getStandingsPageUrl(int pageNumber) {
-        return getFullUrl(BASE_OVERALL_LEAGUE_PATH + "?page_standings=" + pageNumber);
+    public static String getStandingsPageUrl(int pageNumber, int mode) {
+            return getFullUrl(getStandingsPagePath(mode) + "?page_standings=" + pageNumber);
+        }
+
+    public static String getStandingsPagePath(int mode) {
+        String path;
+        switch (mode) {
+            case 21 -> {
+                System.out.println("ℹ️  The Mals League teams will be reviewed.");
+                path = BASE_MALS_LEAGUE_PATH;
+            }
+            case 22 -> {
+                System.out.println("ℹ️  The Prognozilla teams will be reviewed.");
+                path = BASE_PROGNOZILLA_LEAGUE_PATH;
+            }
+            default -> {
+                System.out.printf("ℹ️  The first %d teams will be reviewed.%n%n", mode * 50);
+                path = BASE_OVERALL_LEAGUE_PATH;
+            }
+        }
+        return path;
     }
 
     public static String filterSelectorByChild(String selector, String child) {

@@ -23,6 +23,9 @@ public class InputUtils {
             2 - 1-100 positions
             3 - 1-150 positions
              ...
+            20 - 1-1000 positions
+            21 - Mals League
+            22 - Prognozilla
             """ + CYAN + """
             =======================================================
             """ + RESET + BOLD + YELLOW + """

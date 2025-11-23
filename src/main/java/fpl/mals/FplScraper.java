@@ -19,10 +19,10 @@ public class FplScraper {
         int standingsPageCount = Utils.getEnteredPageCount();
         Utils.terminateProgramIfNeeded(standingsPageCount);
 
-        logger.info("ℹ️ Start parsing from " + standingsPageCount + " pages (" + standingsPageCount * 50 + " teams)");
+        logger.info("ℹ️ Start parsing from pages!!");
         long startTime = System.currentTimeMillis();
 
-        List<String> allTeamLinks = Utils.getAllTeamLinks(standingsPageCount);
+        List<String> allTeamLinks = Utils.collectAllTeamLinks(standingsPageCount);
         logger.info("✅ All team links received (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");
 
         logger.info("🚀 Running in multi-threaded mode by Browser pool...");
