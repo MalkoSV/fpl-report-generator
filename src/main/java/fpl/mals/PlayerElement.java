@@ -1,6 +1,7 @@
 package fpl.mals;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +26,10 @@ public record PlayerElement(
         int minutes,
         int starts,
         int defensiveContribution,
+
+        @JsonProperty("defensive_contribution_per_90")
         double defensiveContributionPer90,
+
         int cleanSheets,
         int cornersAndIndirectFreekicksOrder,
         int directFreekicksOrder,
