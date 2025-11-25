@@ -1,6 +1,7 @@
 package fpl.mals.utils;
 
 import fpl.mals.Player;
+import fpl.mals.PlayerElement;
 import fpl.mals.Team;
 import fpl.mals.TeamSummary;
 import org.apache.poi.ss.usermodel.Cell;
@@ -54,18 +55,19 @@ public class OutputUtils {
         return outDir;
     }
 
-    public static void exportResultsToExcel(List<Team> teams, String fileName, String[] args) {
+    public static void exportResultsToExcel(List<Team> teams, List<PlayerElement> playersData, String fileName, String[] args) {
         TeamSummary summary = TeamUtils.calculateSummary(teams);
         File file = new File(getOutputDir(args), fileName);
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet allPlayersSheet = createPlayersSheet(workbook, summary.players(), "All players");
-            createPlayersSheet(workbook, PlayerUtils.getOnlyStartPlayers(summary.players()), "Only start");
-            createPlayersSheet(workbook, PlayerUtils.getOnlyBenchPlayers(summary.players()), "Only bench");
-            createPlayersSheet(workbook, PlayerUtils.getDoubtfulPlayers(summary.players()), "Doubtful");
-            createPlayersSheet(workbook, PlayerUtils.getBenchPlayersWithHighPoints(summary.players()), "Bench (>5 points)");
-            createPlayersSheet(workbook, PlayerUtils.getPlayersWhoCaptain(summary.players()), "Captain");
+            Sheet allPlayersSheet = createPlayerGwSheet(workbook, summary.players(), "All players");
+            createPlayerGwSheet(workbook, PlayerUtils.getOnlyStartPlayers(summary.players()), "Only start");
+            createPlayerGwSheet(workbook, PlayerUtils.getOnlyBenchPlayers(summary.players()), "Only bench");
+            createPlayerGwSheet(workbook, PlayerUtils.getDoubtfulPlayers(summary.players()), "Doubtful");
+            createPlayerGwSheet(workbook, PlayerUtils.getBenchPlayersWithHighPoints(summary.players()), "Bench (>5 points)");
+            createPlayerGwSheet(workbook, PlayerUtils.getPlayersWhoCaptain(summary.players()), "Captain");
             addSummaryInformation(workbook, allPlayersSheet, teams, summary);
+            createPlayerStatsSheet(workbook, playersData, "Players stats");
 
             try (FileOutputStream fileOut = new FileOutputStream(file)) {
                 workbook.write(fileOut);
@@ -76,7 +78,7 @@ public class OutputUtils {
         logger.info("💾 Excel file saved successfully: " + file.getAbsolutePath());
     }
 
-    public static Sheet createPlayersSheet(Workbook workbook, List<Player> players, String sheetName) {
+    public static Sheet createPlayerGwSheet(Workbook workbook, List<Player> players, String sheetName) {
         Sheet sheet = workbook.createSheet(sheetName);
         CellStyle headerStyle = getHeaderStyle(workbook);
 
@@ -100,6 +102,55 @@ public class OutputUtils {
             row.createCell(6).setCellValue(entry.getCount() - entry.getStart());
             row.createCell(7).setCellValue(entry.getAvailability());
             row.createCell(8).setCellValue(entry.getPoints());
+        }
+        sheet.autoSizeColumn(0);
+
+        return sheet;
+    }
+
+    public static Sheet createPlayerStatsSheet(Workbook workbook, List<PlayerElement> players, String sheetName) {
+
+        List<String> columnHeaders = List.of(
+                "Name",
+                "Points",
+                "Form",
+                "PPM",
+                "Bonus",
+                "Goals",
+                "Assists",
+                "xG",
+                "xA",
+                "xGI",
+                "Val (S)",
+                "Val (F)"
+        );
+
+        Sheet sheet = workbook.createSheet(sheetName);
+        CellStyle headerStyle = getHeaderStyle(workbook);
+
+        Row header = sheet.createRow(0);
+        for (int i = 0; i < columnHeaders.size(); i++) {
+            Cell headerCell = header.createCell(i);
+            headerCell.setCellValue(columnHeaders.get(i));
+            headerCell.setCellStyle(headerStyle);
+            sheet.autoSizeColumn(i);
+        }
+
+        int rowNum = 1;
+        for (var entry : players) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(entry.webName());
+            row.createCell(1).setCellValue(entry.totalPoints());
+            row.createCell(2).setCellValue(entry.form());
+            row.createCell(3).setCellValue(entry.pointsPerGame());
+            row.createCell(4).setCellValue(entry.bonus());
+            row.createCell(5).setCellValue(entry.goalsScored());
+            row.createCell(6).setCellValue(entry.assists());
+            row.createCell(7).setCellValue(entry.expectedGoals());
+            row.createCell(8).setCellValue(entry.expectedAssists());
+            row.createCell(9).setCellValue(entry.expectedGoalInvolvements());
+            row.createCell(10).setCellValue(entry.valueSeason());
+            row.createCell(11).setCellValue(entry.valueForm());
         }
         sheet.autoSizeColumn(0);
 

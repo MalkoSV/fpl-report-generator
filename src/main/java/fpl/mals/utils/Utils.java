@@ -76,6 +76,7 @@ public class Utils {
         int total = teamLinks.size();
 
         int browserCount = Math.min(5, Runtime.getRuntime().availableProcessors());
+        logger.info("🚀 Running in multi-threaded mode with a browser pool...");
         logger.info("⏱️ Using " + browserCount + " browser threads!");
 
         ExecutorService executorServicePool = Executors.newFixedThreadPool(browserCount);
