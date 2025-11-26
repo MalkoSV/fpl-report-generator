@@ -1,6 +1,6 @@
-package fpl.mals.utils;
+package fpl.utils;
 
-import fpl.mals.Player;
+import fpl.web.model.Player;
 
 import java.util.Comparator;
 import java.util.List;

@@ -1,4 +1,4 @@
-package fpl.mals.utils;
+package fpl.utils;
 
 import java.util.Scanner;
 

@@ -1,4 +1,4 @@
-package fpl.mals.utils;
+package fpl.utils;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
@@ -7,9 +7,9 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.WaitUntilState;
-import fpl.mals.Player;
-import fpl.mals.Position;
-import fpl.mals.Team;
+import fpl.web.model.Player;
+import fpl.web.model.Position;
+import fpl.web.model.Team;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -232,10 +232,3 @@ public class Utils {
     }
 
 }
-
-//                            String teamName = page.evaluate(
-//                                    "sel => document.querySelector(sel)?.innerText || ''",
-//                                    teamNameSelector
-//                            ).toString();
-
-

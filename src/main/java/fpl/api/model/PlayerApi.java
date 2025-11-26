@@ -1,13 +1,10 @@
-package fpl.mals;
+package fpl.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Comparator;
-import java.util.List;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record PlayerElement(
+public record PlayerApi(
         String webName,
         double form,
         double pointsPerGame,
@@ -35,18 +32,4 @@ public record PlayerElement(
         int penaltiesOrder,
         int formRankType,
         String news
-) {
-    public static List<PlayerElement> filter(List<PlayerElement> players, int points, double ppm, double xgi) {
-        return players.stream()
-                .filter(
-                        pe -> pe.totalPoints > points
-                        && pe.pointsPerGame > ppm
-                        && pe.expectedGoalInvolvements > xgi
-                )
-                .sorted(Comparator.comparing(PlayerElement::totalPoints)
-                        .thenComparing(PlayerElement::form)
-                        .reversed()
-                )
-                .toList();
-    }
-}
+) {}

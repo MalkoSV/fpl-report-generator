@@ -1,4 +1,4 @@
-package fpl.mals;
+package fpl;
 
 import com.microsoft.playwright.*;
 

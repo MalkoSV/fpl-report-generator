@@ -1,8 +1,8 @@
-package fpl.mals.utils;
+package fpl.utils;
 
-import fpl.mals.Player;
-import fpl.mals.Team;
-import fpl.mals.TeamSummary;
+import fpl.web.model.Player;
+import fpl.web.model.Team;
+import fpl.web.model.TeamSummary;
 
 import java.util.LinkedHashMap;
 import java.util.List;

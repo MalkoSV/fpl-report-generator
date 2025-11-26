@@ -1,8 +1,10 @@
-package fpl.mals;
+package fpl;
 
-import fpl.mals.utils.OutputUtils;
-import fpl.mals.utils.ParserUtils;
-import fpl.mals.utils.Utils;
+import fpl.api.model.PlayerApi;
+import fpl.api.parser.PlayerParser;
+import fpl.utils.OutputUtils;
+import fpl.utils.Utils;
+import fpl.web.model.Team;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.time.LocalDateTime;
@@ -37,7 +39,7 @@ public class FplScraper {
         List<Team> teams = Utils.collectStats(allTeamLinks);
 
         logger.info("ℹ️ Collecting players data from API...");
-        List<PlayerElement> playersData = ParserUtils.parsePlayerElements();
+        List<PlayerApi> playersData = PlayerParser.parsePlayers();
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));
         String fileName = "FPL_Teams_top%d(%ds_duration)_%s.xlsx".formatted(

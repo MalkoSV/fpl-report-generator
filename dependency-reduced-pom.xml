@@ -20,7 +20,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>fpl.mals.FplScraper</mainClass>
+                  <mainClass>fpl.FplScraper</mainClass>
                 </transformer>
               </transformers>
             </configuration>

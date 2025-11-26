@@ -1,9 +1,10 @@
-package fpl.mals.utils;
+package fpl.utils;
 
-import fpl.mals.Player;
-import fpl.mals.PlayerElement;
-import fpl.mals.Team;
-import fpl.mals.TeamSummary;
+import fpl.service.PlayerElementService;
+import fpl.web.model.Player;
+import fpl.api.model.PlayerApi;
+import fpl.web.model.Team;
+import fpl.web.model.TeamSummary;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -55,7 +56,7 @@ public class OutputUtils {
         return outDir;
     }
 
-    public static void exportResultsToExcel(List<Team> teams, List<PlayerElement> playersData, String fileName, String[] args) {
+    public static void exportResultsToExcel(List<Team> teams, List<PlayerApi> playersData, String fileName, String[] args) {
         TeamSummary summary = TeamUtils.calculateSummary(teams);
         File file = new File(getOutputDir(args), fileName);
 
@@ -67,7 +68,7 @@ public class OutputUtils {
             createPlayerGwSheet(workbook, PlayerUtils.getBenchPlayersWithHighPoints(summary.players()), "Bench (>5 points)");
             createPlayerGwSheet(workbook, PlayerUtils.getPlayersWhoCaptain(summary.players()), "Captain");
             addSummaryInformation(workbook, allPlayersSheet, teams, summary);
-            createPlayerStatsSheet(workbook, PlayerElement.filter(playersData, 20, 2.5,1.5),"Players stats");
+            createPlayerStatsSheet(workbook, PlayerElementService.filter(playersData, 20, 2.5,1.5),"Players stats");
 
             try (FileOutputStream fileOut = new FileOutputStream(file)) {
                 workbook.write(fileOut);
@@ -108,7 +109,7 @@ public class OutputUtils {
         return sheet;
     }
 
-    public static Sheet createPlayerStatsSheet(Workbook workbook, List<PlayerElement> players, String sheetName) {
+    public static Sheet createPlayerStatsSheet(Workbook workbook, List<PlayerApi> players, String sheetName) {
 
         List<String> columnHeaders = List.of(
                 "Name",

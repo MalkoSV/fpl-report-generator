@@ -1,6 +1,6 @@
-package fpl.mals;
+package fpl.web.model;
 
-import fpl.mals.utils.PlayerUtils;
+import fpl.utils.PlayerUtils;
 
 import java.util.List;
 import java.util.stream.Stream;
