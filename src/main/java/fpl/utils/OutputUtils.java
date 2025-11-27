@@ -68,7 +68,7 @@ public class OutputUtils {
             createPlayerGwSheet(workbook, PlayerUtils.getBenchPlayersWithHighPoints(summary.players()), "Bench (>5 points)");
             createPlayerGwSheet(workbook, PlayerUtils.getPlayersWhoCaptain(summary.players()), "Captain");
             addSummaryInformation(workbook, allPlayersSheet, teams, summary);
-            createPlayerStatsSheet(workbook, PlayerApiService.filter(playersData, 20, 2.5,1.5),"Players stats");
+            createPlayerStatsSheet(workbook, PlayerApiService.filter(playersData, 20, 3,1.2),"Players stats");
 
             try (FileOutputStream fileOut = new FileOutputStream(file)) {
                 workbook.write(fileOut);

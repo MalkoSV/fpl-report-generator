@@ -15,6 +15,10 @@ public class StandingsParser {
         this.mode = mode;
     }
 
+    public static StandingsParser of(int mode) {
+        return new StandingsParser(mode);
+    }
+
     public List<TeamStats> parseStandings() throws Exception {
         List<TeamStats> list = new ArrayList<>();
         int totalPages = getTotalPages();
@@ -29,16 +33,7 @@ public class StandingsParser {
             String json = JsonUtils.loadJsonFromUri(uri);
             LeagueResponse response = JsonUtils.MAPPER.readValue(json, LeagueResponse.class);
 
-            response.standings().results().forEach(t ->
-                    list.add(new TeamStats(
-                            t.eventTotal(),
-                            t.playerName(),
-                            t.rank(),
-                            t.total(),
-                            t.entry(),
-                            t.entryName()
-                    ))
-            );
+            list.addAll(response.standings().results());
         }
 
         return list;

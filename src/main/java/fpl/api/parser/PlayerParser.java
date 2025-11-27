@@ -1,10 +1,9 @@
 package fpl.api.parser;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import fpl.api.FplApiEndPoints;
 import fpl.api.model.PlayerDto;
+import fpl.api.model.PlayersResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerParser {
@@ -12,17 +11,12 @@ public class PlayerParser {
     private PlayerParser() {}
 
     public static List<PlayerDto> parsePlayers() throws Exception {
-        String json = JsonUtils.loadJsonFromUri(FplApiEndPoints.getUri(FplApiEndPoints.BOOTSTRAP));
-        JsonNode root = JsonUtils.MAPPER.readTree(json);
-        JsonNode elements = root.get("elements");
+        var uri = FplApiEndPoints.getUri(FplApiEndPoints.BOOTSTRAP);
+        String json = JsonUtils.loadJsonFromUri(uri);
 
-        List<PlayerDto> list = new ArrayList<>();
+        PlayersResponse response = JsonUtils.MAPPER.readValue(json, PlayersResponse.class);
 
-        for (JsonNode el : elements) {
-            list.add(JsonUtils.MAPPER.treeToValue(el, PlayerDto.class));
-        }
-
-        return list;
+        return response.elements();
     }
 
 }
