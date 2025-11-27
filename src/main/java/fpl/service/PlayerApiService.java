@@ -1,20 +1,20 @@
 package fpl.service;
 
-import fpl.api.model.PlayerApi;
+import fpl.api.model.PlayerDto;
 
 import java.util.Comparator;
 import java.util.List;
 
-public class PlayerElementService {
-    public static List<PlayerApi> filter(List<PlayerApi> players, int points, double ppm, double xgi) {
+public class PlayerApiService {
+    public static List<PlayerDto> filter(List<PlayerDto> players, int points, double ppm, double xgi) {
         return players.stream()
                 .filter(
                         pe -> pe.totalPoints() > points
                                 && pe.pointsPerGame() > ppm
                                 && pe.expectedGoalInvolvements() > xgi
                 )
-                .sorted(Comparator.comparing(PlayerApi::totalPoints)
-                        .thenComparing(PlayerApi::form)
+                .sorted(Comparator.comparing(PlayerDto::totalPoints)
+                        .thenComparing(PlayerDto::form)
                         .reversed()
                 )
                 .toList();

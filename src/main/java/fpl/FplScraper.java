@@ -1,6 +1,6 @@
 package fpl;
 
-import fpl.api.model.PlayerApi;
+import fpl.api.model.PlayerDto;
 import fpl.api.parser.PlayerParser;
 import fpl.utils.OutputUtils;
 import fpl.utils.Utils;
@@ -39,7 +39,7 @@ public class FplScraper {
         List<Team> teams = Utils.collectStats(allTeamLinks);
 
         logger.info("ℹ️ Collecting players data from API...");
-        List<PlayerApi> playersData = PlayerParser.parsePlayers();
+        List<PlayerDto> playersData = PlayerParser.parsePlayers();
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));
         String fileName = "FPL_Teams_top%d(%ds_duration)_%s.xlsx".formatted(

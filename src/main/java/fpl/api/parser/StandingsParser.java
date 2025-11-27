@@ -1,7 +1,7 @@
 package fpl.api.parser;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import fpl.api.FplApiEndPoints;
+import fpl.api.model.LeagueResponse;
 import fpl.api.model.TeamStats;
 
 import java.util.ArrayList;
@@ -9,27 +9,42 @@ import java.util.List;
 
 public class StandingsParser {
 
-    private StandingsParser() {}
+    private final int mode;
 
-    public static List<TeamStats> parseStandings(int mode) throws Exception {
-        int pages = mode <= 20 ? mode : 1;
+    private StandingsParser(int mode) {
+        this.mode = mode;
+    }
+
+    public List<TeamStats> parseStandings() throws Exception {
         List<TeamStats> list = new ArrayList<>();
+        int totalPages = getTotalPages();
 
-        for (int i = 1; i <= pages; i++) {
-            String json = JsonUtils.loadJsonFromUri(FplApiEndPoints.getUri(
+        for (int page = 1; page <= totalPages; page++) {
+            var uri = FplApiEndPoints.getUri(
                     FplApiEndPoints.LEAGUE,
                     FplApiEndPoints.getLeagueId(mode),
-                    i
-            ));
-            JsonNode root = JsonUtils.MAPPER.readTree(json);
-            JsonNode elements = root.get("elements");
+                    page
+            );
 
-            for (JsonNode el : elements) {
-                list.add(JsonUtils.MAPPER.treeToValue(el, TeamStats.class));
-            }
+            String json = JsonUtils.loadJsonFromUri(uri);
+            LeagueResponse response = JsonUtils.MAPPER.readValue(json, LeagueResponse.class);
+
+            response.standings().results().forEach(t ->
+                    list.add(new TeamStats(
+                            t.eventTotal(),
+                            t.playerName(),
+                            t.rank(),
+                            t.total(),
+                            t.entry(),
+                            t.entryName()
+                    ))
+            );
         }
+
         return list;
     }
 
-
+    private int getTotalPages() {
+        return mode <= 20 ? mode : 1;
+    }
 }
