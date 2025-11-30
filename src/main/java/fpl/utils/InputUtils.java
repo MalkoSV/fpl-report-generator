@@ -3,6 +3,8 @@ package fpl.utils;
 import java.util.Scanner;
 
 public class InputUtils {
+    public static final int MAX_PAGES = 200;
+
     private static final Scanner scanner = new Scanner(System.in);
 
     private static final String RESET = "\u001B[0m";
@@ -21,11 +23,11 @@ public class InputUtils {
             
             1 - 1-50 positions
             2 - 1-100 positions
-            3 - 1-150 positions
              ...
-            20 - 1-1000 positions
-            21 - Mals League
-            22 - Prognozilla
+            200 - 1-10 000 positions
+            =======================================================
+            201 - Mals League
+            202 - Prognozilla
             """ + CYAN + """
             =======================================================
             """ + RESET + BOLD + YELLOW + """

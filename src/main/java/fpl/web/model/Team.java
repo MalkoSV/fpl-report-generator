@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public record Team(
-        String name,
         int tripleCaptain,
         int wildCard,
         int benchBoost,
@@ -15,14 +14,14 @@ public record Team(
         List<Player> goalkeeper,
         List<Player> defenders,
         List<Player> midfielders,
-        List<Player> offenders,
+        List<Player> forwards,
         List<Player> bench) {
 
     public static long countStartPlayersWithZero(Team t) {
         return PlayerUtils.countStartPlayersWithZeroInList(t.goalkeeper())
                 + PlayerUtils.countStartPlayersWithZeroInList(t.defenders())
                 + PlayerUtils.countStartPlayersWithZeroInList(t.midfielders())
-                + PlayerUtils.countStartPlayersWithZeroInList(t.offenders())
+                + PlayerUtils.countStartPlayersWithZeroInList(t.forwards())
                 + PlayerUtils.countStartPlayersWithZeroInList(t.bench());
     }
 
@@ -31,7 +30,7 @@ public record Team(
                         goalkeeper,
                         defenders,
                         midfielders,
-                        offenders,
+                        forwards,
                         bench
                 )
                 .flatMap(List::stream);

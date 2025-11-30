@@ -6,9 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record PlayerDto(
         String webName,
+        int id,
         double form,
         double pointsPerGame,
         int totalPoints,
+        int eventPoints,
         double valueForm,
         double valueSeason,
         int goalsScored,
@@ -31,5 +33,11 @@ public record PlayerDto(
         int directFreekicksOrder,
         int penaltiesOrder,
         int formRankType,
+        Integer chanceOfPlayingThisRound,
+        Integer chanceOfPlayingNextRound,
         String news
-) {}
+) {
+    public int chanceSafe() {
+        return chanceOfPlayingThisRound == null ? 100 : chanceOfPlayingThisRound;
+    }
+}

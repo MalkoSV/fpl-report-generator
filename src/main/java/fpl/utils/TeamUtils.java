@@ -104,7 +104,7 @@ public class TeamUtils {
                 .map(t -> String.format("%d-%d-%d",
                         t.defenders().size(),
                         t.midfielders().size(),
-                        t.offenders().size()
+                        t.forwards().size()
                 ))
                 .collect(Collectors.groupingBy(
                         Function.identity(),

@@ -3,6 +3,7 @@ package fpl.api.parser;
 import fpl.api.FplApiEndPoints;
 import fpl.api.model.LeagueResponse;
 import fpl.api.model.TeamStats;
+import fpl.utils.InputUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,6 @@ public class StandingsParser {
     }
 
     private int getTotalPages() {
-        return mode <= 20 ? mode : 1;
+        return mode <= InputUtils.MAX_PAGES ? mode : 1;
     }
 }

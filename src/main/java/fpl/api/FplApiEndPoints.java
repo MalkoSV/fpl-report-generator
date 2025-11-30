@@ -19,8 +19,8 @@ public class FplApiEndPoints {
 
     public static int getLeagueId(int mode) {
         return switch (mode) {
-            case 21 -> MALS_LEAGUE_ID;
-            case 22 -> PROGNOZILLA_LEAGUE_ID;
+            case 201 -> MALS_LEAGUE_ID;
+            case 202 -> PROGNOZILLA_LEAGUE_ID;
             default -> OVERALL_LEAGUE_ID;
         };
     }

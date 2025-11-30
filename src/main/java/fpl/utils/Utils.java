@@ -40,7 +40,7 @@ public class Utils {
 
 
     public static int getEnteredPageCount() {
-        int count = InputUtils.getEnteredNumber(InputUtils.DESCRIPTION_FOR_ENTER_PAGE_NUMBER, 0, 22);
+        int count = InputUtils.getEnteredNumber(InputUtils.DESCRIPTION_FOR_ENTER_PAGE_NUMBER, 0, 202);
         System.out.printf("✅ Your choice - %d%n", count);
 
         return count;
@@ -182,10 +182,9 @@ public class Utils {
                             }
 
                             Team currentTeam = new Team(
-                                    teamName,
-                                    hasTripleCaptain ? 1 : 0,
+                                    BoolUtils.asInt(hasTripleCaptain),
                                     wildcard,
-                                    hasBenchBoost ? 1 : 0,
+                                    BoolUtils.asInt(hasBenchBoost),
                                     freeHit,
                                     transfers,
                                     playersByPosition.get(Position.GOALKEEPER),
