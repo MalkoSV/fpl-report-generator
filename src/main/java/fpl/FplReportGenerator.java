@@ -1,12 +1,12 @@
 package fpl;
 
-import fpl.api.model.dto.BootstrapResponse;
-import fpl.api.model.dto.PlayerDto;
-import fpl.api.parser.BootstrapParser;
-import fpl.service.TeamLinkService;
-import fpl.service.TeamScrapingService;
+import fpl.api.dto.BootstrapResponse;
+import fpl.api.dto.PlayerDto;
+import fpl.parser.BootstrapParser;
+import fpl.domain.service.TeamLinkService;
+import fpl.domain.service.TeamParsingService;
 import fpl.utils.FplLogger;
-import fpl.api.model.Team;
+import fpl.domain.model.Team;
 import fpl.utils.OutputUtils;
 import fpl.utils.Utils;
 import org.fusesource.jansi.AnsiConsole;
@@ -17,8 +17,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class FplApiScraper {
-    private static final Logger logger = Logger.getLogger(FplApiScraper.class.getName());
+public class FplReportGenerator {
+    private static final Logger logger = Logger.getLogger(FplReportGenerator.class.getName());
 
     public static void main(String[] args) throws Exception {
         System.setProperty("PLAYWRIGHT_BROWSERS_PATH", "browsers");
@@ -36,7 +36,7 @@ public class FplApiScraper {
         logger.info("✅ Successfully retrieved all team links (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");
 
         logger.info("ℹ️ Collecting data from the team pages...");
-        List<Team> teams = TeamScrapingService.collectStats(allTeamLinks);
+        List<Team> teams = TeamParsingService.collectStats(allTeamLinks);
 
         logger.info("ℹ️ Collecting players data from API...");
         BootstrapResponse bootstrapResponse = BootstrapParser.parseBootstrap();

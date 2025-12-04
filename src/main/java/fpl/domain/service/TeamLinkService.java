@@ -1,10 +1,10 @@
-package fpl.service;
+package fpl.domain.service;
 
 import fpl.api.FplApiEndPoints;
-import fpl.api.model.dto.BootstrapResponse;
-import fpl.api.model.dto.TeamStats;
-import fpl.api.parser.BootstrapParser;
-import fpl.api.parser.StandingsParser;
+import fpl.api.dto.BootstrapResponse;
+import fpl.api.dto.TeamStats;
+import fpl.parser.BootstrapParser;
+import fpl.parser.StandingsParser;
 
 import java.net.URI;
 import java.util.List;

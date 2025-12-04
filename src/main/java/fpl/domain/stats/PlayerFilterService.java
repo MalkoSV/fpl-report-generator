@@ -1,11 +1,12 @@
-package fpl.service;
+package fpl.domain.stats;
 
-import fpl.api.model.dto.PlayerDto;
+import fpl.api.dto.PlayerDto;
 
 import java.util.Comparator;
 import java.util.List;
 
-public class PlayerApiService {
+public class PlayerFilterService {
+
     public static List<PlayerDto> filter(List<PlayerDto> players, int points, double ppm, double xgi) {
         return players.stream()
                 .filter(

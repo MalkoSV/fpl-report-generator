@@ -1,4 +1,4 @@
-package fpl.api.model;
+package fpl.domain.model;
 
 import java.util.List;
 

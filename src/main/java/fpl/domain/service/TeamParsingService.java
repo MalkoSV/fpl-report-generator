@@ -1,15 +1,15 @@
-package fpl.service;
+package fpl.domain.service;
 
-import fpl.api.model.dto.BootstrapResponse;
-import fpl.api.model.dto.EntryResponse;
-import fpl.api.model.dto.Pick;
-import fpl.api.model.dto.PlayerDto;
-import fpl.api.model.PositionType;
-import fpl.api.parser.BootstrapParser;
-import fpl.api.parser.EntryParser;
+import fpl.api.dto.BootstrapResponse;
+import fpl.api.dto.EntryResponse;
+import fpl.api.dto.Pick;
+import fpl.api.dto.PlayerDto;
+import fpl.domain.model.PositionType;
+import fpl.parser.BootstrapParser;
+import fpl.parser.EntryParser;
 import fpl.utils.BoolUtils;
-import fpl.api.model.Player;
-import fpl.api.model.Team;
+import fpl.domain.model.Player;
+import fpl.domain.model.Team;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -27,16 +27,16 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.collections4.ListUtils.partition;
 
-public class TeamScrapingService {
+public class TeamParsingService {
 
-    private static final Logger logger = Logger.getLogger(TeamScrapingService.class.getName());
+    private static final Logger logger = Logger.getLogger(TeamParsingService.class.getName());
 
     private static final String WILDCARD = "wildcard";
     private static final String TRIPLE_CAPTAIN = "3xc";
     private static final String BENCH_BOOST = "bboost";
     private static final String FREE_HIT = "freehit";
 
-    private TeamScrapingService() {
+    private TeamParsingService() {
     }
 
     public static List<Team> collectStats(List<URI> uris) throws Exception {

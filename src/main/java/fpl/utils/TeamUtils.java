@@ -1,8 +1,8 @@
 package fpl.utils;
 
-import fpl.api.model.Player;
-import fpl.api.model.Team;
-import fpl.api.model.TeamSummary;
+import fpl.domain.model.Player;
+import fpl.domain.model.Team;
+import fpl.domain.model.TeamSummary;
 
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -1,11 +1,11 @@
 package fpl.arch;
 
-import fpl.api.model.dto.BootstrapResponse;
-import fpl.api.model.dto.PlayerDto;
-import fpl.api.parser.BootstrapParser;
+import fpl.api.dto.BootstrapResponse;
+import fpl.api.dto.PlayerDto;
+import fpl.parser.BootstrapParser;
 import fpl.utils.OutputUtils;
 import fpl.utils.Utils;
-import fpl.api.model.Team;
+import fpl.domain.model.Team;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.time.LocalDateTime;

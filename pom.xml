@@ -5,11 +5,11 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fpl.mals</groupId>
-    <artifactId>FplScraper</artifactId>
+    <groupId>fpl</groupId>
+    <artifactId>FplReportGenerator</artifactId>
     <version>1.0.0</version>
-    <name>FPL Scraper</name>
-    <description>Fantasy Premier League Scraper (Playwright + Apache POI)</description>
+    <name>FPL Parser</name>
+    <description>Fantasy Premier League Parser (Apache POI)</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

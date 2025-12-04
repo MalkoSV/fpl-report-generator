@@ -1,6 +1,6 @@
 package fpl.excel.sheets;
 
-import fpl.api.model.dto.PlayerDto;
+import fpl.api.dto.PlayerDto;
 import fpl.excel.builder.Col;
 import fpl.excel.builder.TableSheetWriter;
 

@@ -1,11 +1,11 @@
 package fpl.utils;
 
-import fpl.api.model.Player;
-import fpl.api.model.Team;
-import fpl.api.model.TeamSummary;
-import fpl.api.model.dto.PlayerDto;
+import fpl.domain.model.Player;
+import fpl.domain.model.Team;
+import fpl.domain.model.TeamSummary;
+import fpl.api.dto.PlayerDto;
 import fpl.output.OutputDirectoryResolver;
-import fpl.service.PlayerApiService;
+import fpl.domain.stats.PlayerFilterService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -52,7 +52,7 @@ public class OutputUtilsCopy {
             createPlayerGwSheet(workbook, PlayerUtils.getBenchPlayersWithHighPoints(summary.players()), "Bench (>5 points)");
             createPlayerGwSheet(workbook, PlayerUtils.getPlayersWhoCaptain(summary.players()), "Captain");
             addSummaryInformation(workbook, allPlayersSheet, teams, summary);
-            createPlayerStatsSheet(workbook, PlayerApiService.filter(playersData, 20, 3,1.2),"Players stats");
+            createPlayerStatsSheet(workbook, PlayerFilterService.filter(playersData, 20, 3,1.2),"Players stats");
 
             try (FileOutputStream fileOut = new FileOutputStream(file)) {
                 workbook.write(fileOut);

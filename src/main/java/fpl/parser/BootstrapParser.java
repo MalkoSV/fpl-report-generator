@@ -1,9 +1,9 @@
-package fpl.api.parser;
+package fpl.parser;
 
 import fpl.api.FplApiEndPoints;
-import fpl.api.model.dto.BootstrapResponse;
-import fpl.api.model.dto.Event;
-import fpl.api.model.dto.PlayerDto;
+import fpl.api.dto.BootstrapResponse;
+import fpl.api.dto.Event;
+import fpl.api.dto.PlayerDto;
 
 import java.util.List;
 

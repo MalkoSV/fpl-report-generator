@@ -1,6 +1,6 @@
 package fpl.excel.sheets;
 
-import fpl.api.model.Player;
+import fpl.domain.model.Player;
 import fpl.excel.builder.Col;
 import fpl.excel.builder.TableSheetWriter;
 
@@ -16,6 +16,6 @@ public class BenchPlayersSheetWriter extends TableSheetWriter<Player> {
     );
 
     public BenchPlayersSheetWriter(List<Player> players) {
-        super("Bench (>5 points)", players, COLUMNS);
+        super("Only Bench", players, COLUMNS);
     }
 }

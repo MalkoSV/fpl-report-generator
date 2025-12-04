@@ -1,6 +1,6 @@
 package fpl.excel.sheets;
 
-import fpl.api.model.Player;
+import fpl.domain.model.Player;
 import fpl.excel.builder.Col;
 import fpl.excel.builder.TableSheetWriter;
 
@@ -11,7 +11,7 @@ public class CaptainPlayersSheetWriter extends TableSheetWriter<Player> {
     private static final List<Col<Player>> COLUMNS = List.of(
             new Col<>("Name", Player::getName),
             new Col<>("Captain", Player::getCaptain),
-            new Col<>("Points", Player::getPoints)
+            new Col<>("Points", player -> player.getPoints() * 2)
     );
 
     public CaptainPlayersSheetWriter(List<Player> players) {

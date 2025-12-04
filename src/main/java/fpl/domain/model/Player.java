@@ -1,4 +1,4 @@
-package fpl.api.model;
+package fpl.domain.model;
 
 public class Player {
     private final String name;
@@ -10,14 +10,14 @@ public class Player {
     private int points;
     private int availability;
 
-    public Player(String name, int count, int start, int captain, int tripleCaptain, int vice, int score, int availability) {
+    public Player(String name, int count, int start, int captain, int tripleCaptain, int vice, int points, int availability) {
         this.name = name;
         this.count = count;
         this.start = start;
         this.captain = captain;
         this.tripleCaptain = tripleCaptain;
         this.vice = vice;
-        this.points = score;
+        this.points = points;
         this.availability = availability;
     }
 

@@ -3,17 +3,18 @@ package fpl.utils;
 import fpl.excel.core.ExcelWriter;
 import fpl.excel.io.FileNameGenerator;
 import fpl.excel.io.WorkbookFactory;
-import fpl.excel.sheets.BenchPlayersSheetWriter;
+import fpl.excel.sheets.HighPointsBenchSheetWriter;
 import fpl.excel.sheets.CaptainPlayersSheetWriter;
 import fpl.excel.sheets.DoubtfulPlayersSheetWriter;
 import fpl.excel.sheets.GameweekPlayersSheetWriter;
+import fpl.excel.sheets.BenchPlayersSheetWriter;
+import fpl.excel.sheets.StartPlayersSheetWriter;
 import fpl.excel.sheets.PlayerStatsSheetWriter;
 import fpl.output.OutputDirectoryResolver;
-import fpl.service.PlayerApiService;
-import fpl.api.model.Player;
-import fpl.api.model.dto.PlayerDto;
-import fpl.api.model.Team;
-import fpl.api.model.TeamSummary;
+import fpl.domain.stats.PlayerFilterService;
+import fpl.api.dto.PlayerDto;
+import fpl.domain.model.Team;
+import fpl.domain.model.TeamSummary;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -23,11 +24,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -58,133 +55,18 @@ public class OutputUtils {
 
         TeamSummary summary = TeamUtils.calculateSummary(teams);
         writer.writeExcel(
-                "FPL GW-14 (top %d)_".formatted(teams.size()),
+                "FPL Report GW-14 (top %d)_".formatted(teams.size()),
                 args,
                 new GameweekPlayersSheetWriter(summary.players()),
                 new CaptainPlayersSheetWriter(PlayerUtils.getPlayersWhoCaptain(summary.players())),
+                new StartPlayersSheetWriter(PlayerUtils.getOnlyStartPlayers(summary.players())),
+                new BenchPlayersSheetWriter(PlayerUtils.getOnlyBenchPlayers(summary.players())),
                 new DoubtfulPlayersSheetWriter(PlayerUtils.getDoubtfulPlayers(summary.players())),
-                new BenchPlayersSheetWriter(PlayerUtils.getBenchPlayersWithHighPoints(summary.players())),
-                new PlayerStatsSheetWriter(PlayerApiService.filter(playersData, 20, 3,1.2))
+                new HighPointsBenchSheetWriter(PlayerUtils.getBenchPlayersWithHighPoints(summary.players())),
+                new PlayerStatsSheetWriter(PlayerFilterService.filter(playersData, 20, 3,1.2))
                 );
 
-//            Sheet allPlayersSheet = createPlayerGwSheet(workbook, summary.players(), "All players");
-//            createPlayerGwSheet(workbook, PlayerUtils.getOnlyStartPlayers(summary.players()), "Only start");
-//            createPlayerGwSheet(workbook, PlayerUtils.getOnlyBenchPlayers(summary.players()), "Only bench");
-//            createPlayerGwSheet(workbook, PlayerUtils.getDoubtfulPlayers(summary.players()), "Doubtful");
-//            createPlayerGwSheet(workbook, PlayerUtils.getBenchPlayersWithHighPoints(summary.players()), "Bench (>5 points)");
-//            createPlayerGwSheet(workbook, PlayerUtils.getPlayersWhoCaptain(summary.players()), "Captain");
 //            addSummaryInformation(workbook, allPlayersSheet, teams, summary);
-//            createPlayerStatsSheet(workbook, PlayerApiService.filter(playersData, 20, 3,1.2),"Players stats");
-    }
-
-    public static Sheet createPlayerGwSheet(Workbook workbook, List<Player> players, String sheetName) {
-        Sheet sheet = workbook.createSheet(sheetName);
-        CellStyle headerStyle = getHeaderStyle(workbook);
-
-        Row header = sheet.createRow(0);
-        for (int i = 0; i < COLUMNHEADERS.size(); i++) {
-            Cell headerCell = header.createCell(i);
-            headerCell.setCellValue(COLUMNHEADERS.get(i));
-            headerCell.setCellStyle(headerStyle);
-            sheet.autoSizeColumn(i);
-        }
-
-        int rowNum = 1;
-        for (var entry : players) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(entry.getName());
-            row.createCell(1).setCellValue(entry.getCount());
-            row.createCell(2).setCellValue(entry.getStart());
-            row.createCell(3).setCellValue(entry.getCaptain());
-            row.createCell(4).setCellValue(entry.getTripleCaptain());
-            row.createCell(5).setCellValue(entry.getVice());
-            row.createCell(6).setCellValue(entry.getCount() - entry.getStart());
-            row.createCell(7).setCellValue(entry.getAvailability());
-            row.createCell(8).setCellValue(entry.getPoints());
-        }
-        sheet.autoSizeColumn(0);
-
-        return sheet;
-    }
-
-    public static Sheet createPlayerStatsSheet(Workbook workbook, List<PlayerDto> players, String sheetName) {
-
-        List<String> columnHeaders = List.of(
-                "Name",
-                "Points",
-                "Round",
-                "PPM",
-                "Form",
-                "Rank(F)",
-                "Bonus",
-                "Minutes",
-                "Starts",
-                "CSheets",
-                "DA",
-                "DA(90)",
-                "Goals",
-                "Assists",
-                "G+A",
-                "xG",
-                "xA",
-                "xGI",
-                "GA-xGI",
-                "#Corn",
-                "#Free",
-                "#Pen",
-                "% sel",
-                "Cost",
-                "Val(S)",
-                "Val(F)",
-                "News"
-        );
-
-        Sheet sheet = workbook.createSheet(sheetName);
-        CellStyle headerStyle = getHeaderStyle(workbook);
-
-        Row header = sheet.createRow(0);
-        for (int i = 0; i < columnHeaders.size(); i++) {
-            Cell headerCell = header.createCell(i);
-            headerCell.setCellValue(columnHeaders.get(i));
-            headerCell.setCellStyle(headerStyle);
-        }
-
-        int rowNum = 1;
-        for (var entry : players) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(entry.webName());
-            row.createCell(1).setCellValue(entry.totalPoints());
-            row.createCell(2).setCellValue(entry.eventPoints());
-            row.createCell(3).setCellValue(entry.pointsPerGame());
-            row.createCell(4).setCellValue(entry.form());
-            row.createCell(5).setCellValue(entry.formRankType());
-            row.createCell(6).setCellValue(entry.bonus());
-            row.createCell(7).setCellValue(entry.minutes());
-            row.createCell(8).setCellValue(entry.starts());
-            row.createCell(9).setCellValue(entry.cleanSheets());
-            row.createCell(10).setCellValue(entry.defensiveContribution());
-            row.createCell(11).setCellValue(entry.defensiveContributionPer90());
-            row.createCell(12).setCellValue(entry.goalsScored());
-            row.createCell(13).setCellValue(entry.assists());
-            row.createCell(14).setCellValue(entry.goalsScored() + entry.assists());
-            row.createCell(15).setCellValue(entry.expectedGoals());
-            row.createCell(16).setCellValue(entry.expectedAssists());
-            row.createCell(17).setCellValue(entry.expectedGoalInvolvements());
-            row.createCell(18).setCellValue((entry.goalsScored() + entry.assists()) - entry.expectedGoalInvolvements());
-            row.createCell(19).setCellValue(entry.cornersAndIndirectFreekicksOrder());
-            row.createCell(20).setCellValue(entry.directFreekicksOrder());
-            row.createCell(21).setCellValue(entry.penaltiesOrder());
-            row.createCell(22).setCellValue(entry.selectedByPercent());
-            row.createCell(23).setCellValue((double) entry.nowCost() / 10);
-            row.createCell(24).setCellValue(entry.valueSeason());
-            row.createCell(25).setCellValue(entry.valueForm());
-            row.createCell(26).setCellValue(entry.news());
-        }
-        for (int i = 0; i < columnHeaders.size(); i++) {
-            sheet.autoSizeColumn(i);
-        }
-
-        return sheet;
     }
 
     public static void addSummaryInformation(

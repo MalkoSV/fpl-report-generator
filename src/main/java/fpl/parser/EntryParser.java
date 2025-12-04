@@ -1,7 +1,7 @@
-package fpl.api.parser;
+package fpl.parser;
 
-import fpl.api.model.dto.EntryResponse;
-import fpl.api.model.dto.Pick;
+import fpl.api.dto.EntryResponse;
+import fpl.api.dto.Pick;
 
 import java.net.URI;
 import java.util.List;

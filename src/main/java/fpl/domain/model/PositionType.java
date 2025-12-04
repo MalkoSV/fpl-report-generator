@@ -1,4 +1,4 @@
-package fpl.api.model;
+package fpl.domain.model;
 
 public enum PositionType {
     GK(1), DEF(2), MID(3), FWD(4);

@@ -1,6 +1,6 @@
 package fpl.utils;
 
-import fpl.api.model.Player;
+import fpl.domain.model.Player;
 
 import java.util.Comparator;
 import java.util.List;
@@ -60,7 +60,6 @@ public class PlayerUtils {
     public static List<Player> getPlayersWhoCaptain(List<Player> players) {
         return players.stream()
                 .filter(p -> p.getCaptain() > 0)
-                .peek((p) -> p.setPoints(p.getPoints() * 2))
                 .toList();
     }
 

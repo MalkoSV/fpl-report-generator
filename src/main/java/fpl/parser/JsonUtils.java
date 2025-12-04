@@ -1,4 +1,4 @@
-package fpl.api.parser;
+package fpl.parser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

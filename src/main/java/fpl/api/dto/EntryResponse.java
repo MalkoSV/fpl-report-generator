@@ -1,10 +1,12 @@
-package fpl.api.model.dto;
+package fpl.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record StandingsContainer(
-        List<TeamStats> results
+public record EntryResponse(
+        String activeChip,
+        EntryHistory entryHistory,
+        List<Pick> picks
 ) {}
