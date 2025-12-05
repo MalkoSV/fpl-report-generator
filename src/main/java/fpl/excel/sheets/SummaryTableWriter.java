@@ -1,9 +1,7 @@
-package fpl.excel.summary;
+package fpl.excel.sheets;
 
 import fpl.excel.style.ExcelStyleFactory;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 
 import java.util.Map;
 
@@ -21,19 +19,19 @@ public class SummaryTableWriter {
             int startRow,
             int col1,
             int col2,
-            Object[][] rows
-    ) {
+            Object[][] rows) {
+
         int currentRow = startRow;
 
         for (Object[] r : rows) {
             Row row = getOrCreateRow(currentRow);
 
             Cell c1 = row.createCell(col1);
-            c1.setCellValue(r[0].toString());
+            setCellValue(c1, r[0]);
             c1.setCellStyle(styles.summaryTitle());
 
             Cell c2 = row.createCell(col2);
-            c2.setCellValue(Double.parseDouble(r[1].toString()));
+            setCellValue(c2, r[1]);
             c2.setCellStyle(styles.summaryValue());
 
             currentRow++;
@@ -43,10 +41,8 @@ public class SummaryTableWriter {
 
     public int writeMapTable(
             int startRow,
-            int col1,
-            String title1,
-            int col2,
-            String title2,
+            int col1, String title1,
+            int col2, String title2,
             Map<?, ?> map
     ) {
         Row headerRow = getOrCreateRow(startRow);
@@ -60,16 +56,16 @@ public class SummaryTableWriter {
         h2.setCellStyle(styles.header());
 
         int currentRow = startRow + 1;
-
         for (var entry : map.entrySet()) {
+
             Row r = getOrCreateRow(currentRow);
 
             Cell c1 = r.createCell(col1);
-            c1.setCellValue(entry.getKey().toString());
+            setCellValue(c1, entry.getKey());
             c1.setCellStyle(styles.centered());
 
             Cell c2 = r.createCell(col2);
-            c2.setCellValue(entry.getValue().toString());
+            setCellValue(c2, entry.getValue());
             c2.setCellStyle(styles.centered());
 
             currentRow++;
@@ -81,5 +77,18 @@ public class SummaryTableWriter {
     private Row getOrCreateRow(int rowNum) {
         Row row = sheet.getRow(rowNum);
         return row != null ? row : sheet.createRow(rowNum);
+    }
+
+    private void setCellValue(Cell cell, Object value) {
+        if (value == null) {
+            cell.setBlank();
+            return;
+        }
+
+        if (value instanceof Number num) {
+            cell.setCellValue(num.doubleValue());
+        } else {
+            cell.setCellValue(value.toString());
+        }
     }
 }

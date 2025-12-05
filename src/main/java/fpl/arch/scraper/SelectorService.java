@@ -1,8 +1,8 @@
-package fpl.arch.utils;
+package fpl.arch.scraper;
 
 import com.microsoft.playwright.Locator;
 
-public class SelectorUtils {
+public class SelectorService {
 
     public static final String BASE_URL = "https://fantasy.premierleague.com";
     public static final String BASE_OVERALL_LEAGUE_PATH = "/leagues/314/standings/c";

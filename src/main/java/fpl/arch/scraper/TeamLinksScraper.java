@@ -1,4 +1,4 @@
-package fpl.utils;
+package fpl.arch.scraper;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
@@ -8,9 +8,9 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.WaitUntilState;
 import fpl.domain.model.Player;
-import fpl.arch.utils.SelectorUtils;
 import fpl.arch.model.Position;
 import fpl.domain.model.Team;
+import fpl.utils.BoolUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,25 +27,9 @@ import java.util.stream.IntStream;
 
 import static org.apache.commons.collections4.ListUtils.partition;
 
-public class Utils {
+public class TeamLinksScraper {
 
-    private static final Logger logger = Logger.getLogger(Utils.class.getName());
-
-    public static void terminateProgramIfNeeded(int pageNumber) throws InterruptedException {
-        if (pageNumber == 0) {
-            logger.info("❌ Your choice - program terminated. Good luck!");
-            Thread.sleep(3000);
-            System.exit(0);
-        }
-    }
-
-
-    public static int getEnteredPageCount() {
-        int count = InputUtils.getEnteredNumber(InputUtils.DESCRIPTION_FOR_ENTER_PAGE_NUMBER, 0, 202);
-        System.out.printf("✅ Your choice - %d%n", count);
-
-        return count;
-    }
+    private static final Logger logger = Logger.getLogger(TeamLinksScraper.class.getName());
 
     public static List<String> collectAllTeamLinks(int pageCount) {
         try (Playwright playwright = Playwright.create();
@@ -56,8 +40,8 @@ public class Utils {
             int n = pageCount <= 20 ? pageCount : 1;
 
             return IntStream.rangeClosed(1, n)
-                    .mapToObj(i -> SelectorUtils.getStandingsPageUrl(i, pageCount))
-                    .map(url -> Utils.getTeamLinksFromPage(url, page))
+                    .mapToObj(i -> SelectorService.getStandingsPageUrl(i, pageCount))
+                    .map(url -> TeamLinksScraper.getTeamLinksFromPage(url, page))
                     .flatMap(Collection::stream)
                     .toList();
         }
@@ -65,10 +49,10 @@ public class Utils {
 
     public static List<String> getTeamLinksFromPage(String url, Page page) {
             page.navigate(url, new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
-            page.waitForSelector(SelectorUtils.RECORD_LINK_SELECTOR);
+            page.waitForSelector(SelectorService.RECORD_LINK_SELECTOR);
 
-            return page.locator(SelectorUtils.RECORD_LINK_SELECTOR).all().stream()
-                    .map(el -> SelectorUtils.getFullUrl(el.getAttribute("href")))
+            return page.locator(SelectorService.RECORD_LINK_SELECTOR).all().stream()
+                    .map(el -> SelectorService.getFullUrl(el.getAttribute("href")))
                     .toList();
     }
 
@@ -99,28 +83,28 @@ public class Utils {
                             long startTime = System.currentTimeMillis();
 
                             page.navigate(link, new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
-                            page.waitForSelector(SelectorUtils.PLAYER_POINTS_SELECTOR);
+                            page.waitForSelector(SelectorService.PLAYER_POINTS_SELECTOR);
 
                             boolean foundCaptain = false;
                             boolean foundVice = false;
 
-                            String teamName = page.locator(SelectorUtils.TEAM_NAME_SELECTOR).innerText();
+                            String teamName = page.locator(SelectorService.TEAM_NAME_SELECTOR).innerText();
 
-                            Locator transfersLocator = page.locator(SelectorUtils.TRANSFERS_COUNT_SELECTOR);
+                            Locator transfersLocator = page.locator(SelectorService.TRANSFERS_COUNT_SELECTOR);
                             int transfers = Integer.parseInt(transfersLocator.innerText());
 
-                            Locator chip = page.locator(SelectorUtils.CHIP_SELECTOR);
+                            Locator chip = page.locator(SelectorService.CHIP_SELECTOR);
                             boolean hasBenchBoost = false;
                             boolean hasTripleCaptain = false;
                             int freeHit = 0;
                             int wildcard = 0;
 
                             if (chip.first().isVisible()) {
-                                hasBenchBoost = chip.getByText(SelectorUtils.BENCH_BOOST).first().isVisible();
+                                hasBenchBoost = chip.getByText(SelectorService.BENCH_BOOST).first().isVisible();
                                 if (!hasBenchBoost) {
-                                    freeHit = chip.getByText(SelectorUtils.FREE_HIT).count();
+                                    freeHit = chip.getByText(SelectorService.FREE_HIT).count();
                                     if (freeHit == 0) {
-                                        hasTripleCaptain = chip.getByText(SelectorUtils.TRIPLE_CAPTAIN).first().isVisible();
+                                        hasTripleCaptain = chip.getByText(SelectorService.TRIPLE_CAPTAIN).first().isVisible();
                                         if (!hasTripleCaptain) {
                                             wildcard = 1;
                                         }
@@ -134,11 +118,11 @@ public class Utils {
                             }
 
                             Map<Position, Locator> locatorsByPosition = Map.of(
-                                    Position.GOALKEEPER, page.locator(SelectorUtils.GOALKEEPER_LINE_PLAYER_SELECTOR),
-                                    Position.DEFENDER, page.locator(SelectorUtils.DEFENDER_LINE_PLAYER_SELECTOR),
-                                    Position.MIDFIELDER, page.locator(SelectorUtils.MIDFIELDER_LINE_PLAYER_SELECTOR),
-                                    Position.OFFENDER, page.locator(SelectorUtils.OFFENDER_LINE_PLAYER_SELECTOR),
-                                    Position.BENCH, page.locator(SelectorUtils.BENCH_SELECTOR)
+                                    Position.GOALKEEPER, page.locator(SelectorService.GOALKEEPER_LINE_PLAYER_SELECTOR),
+                                    Position.DEFENDER, page.locator(SelectorService.DEFENDER_LINE_PLAYER_SELECTOR),
+                                    Position.MIDFIELDER, page.locator(SelectorService.MIDFIELDER_LINE_PLAYER_SELECTOR),
+                                    Position.OFFENDER, page.locator(SelectorService.OFFENDER_LINE_PLAYER_SELECTOR),
+                                    Position.BENCH, page.locator(SelectorService.BENCH_SELECTOR)
                             );
 
                             int totalTeamPlayers = 0;
@@ -149,20 +133,20 @@ public class Utils {
 
                                 List<Locator> teamPlayers = player.all();
                                 for (Locator el : teamPlayers) {
-                                    String name = el.locator(SelectorUtils.NAME_SELECTOR).innerText().trim();
+                                    String name = el.locator(SelectorService.NAME_SELECTOR).innerText().trim();
 
-                                    Locator pointsLocator = el.locator(SelectorUtils.PLAYER_POINTS_SELECTOR).first();
+                                    Locator pointsLocator = el.locator(SelectorService.PLAYER_POINTS_SELECTOR).first();
                                     int points = pointsLocator.isVisible()
                                             ? Integer.parseInt(pointsLocator.innerText())
                                             : -8888;
 
                                     Player currentPlayer = new Player(name, 1, points);
 
-                                    if (hasBenchBoost || SelectorUtils.hasStartSquad(el)) {
+                                    if (hasBenchBoost || SelectorService.hasStartSquad(el)) {
                                         currentPlayer.setStart(1);
                                     }
 
-                                    if (!foundCaptain && SelectorUtils.hasCaptainIcon(el)) {
+                                    if (!foundCaptain && SelectorService.hasCaptainIcon(el)) {
                                         foundCaptain = true;
                                         currentPlayer.setCaptain(1);
                                         if (hasTripleCaptain) {
@@ -170,12 +154,12 @@ public class Utils {
                                         }
                                     }
 
-                                    if (!foundVice && SelectorUtils.hasViceIcon(el)) {
+                                    if (!foundVice && SelectorService.hasViceIcon(el)) {
                                         foundVice = true;
                                         currentPlayer.setVice(1);
                                     }
 
-                                    currentPlayer.setAvailability(SelectorUtils.getAvailability(el));
+                                    currentPlayer.setAvailability(SelectorService.getAvailability(el));
 
                                     playerslist.add(currentPlayer);
                                     totalTeamPlayers++;

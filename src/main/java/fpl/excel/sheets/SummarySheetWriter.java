@@ -3,7 +3,6 @@ package fpl.excel.sheets;
 import fpl.excel.builder.GenericSheetWriter;
 import fpl.excel.style.ExcelStyleFactory;
 import fpl.domain.summary.SummaryData;
-import fpl.excel.summary.SummaryTableWriter;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 

@@ -10,6 +10,7 @@ import fpl.excel.sheets.GameweekPlayersSheetWriter;
 import fpl.excel.sheets.BenchPlayersSheetWriter;
 import fpl.excel.sheets.StartPlayersSheetWriter;
 import fpl.excel.sheets.PlayerStatsSheetWriter;
+import fpl.excel.sheets.SummarySheetWriter;
 import fpl.output.OutputDirectoryResolver;
 import fpl.domain.stats.PlayerFilterService;
 import fpl.api.dto.PlayerDto;
@@ -63,6 +64,7 @@ public class OutputUtils {
                 new BenchPlayersSheetWriter(PlayerUtils.getOnlyBenchPlayers(summary.players())),
                 new DoubtfulPlayersSheetWriter(PlayerUtils.getDoubtfulPlayers(summary.players())),
                 new HighPointsBenchSheetWriter(PlayerUtils.getBenchPlayersWithHighPoints(summary.players())),
+//                new SummarySheetWriter(PlayerUtils.getBenchPlayersWithHighPoints(summary.players())),
                 new PlayerStatsSheetWriter(PlayerFilterService.filter(playersData, 20, 3,1.2))
                 );
 

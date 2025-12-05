@@ -2,13 +2,13 @@ package fpl;
 
 import fpl.api.dto.BootstrapResponse;
 import fpl.api.dto.PlayerDto;
+import fpl.app.ConsoleService;
 import fpl.parser.BootstrapParser;
 import fpl.domain.service.TeamLinkService;
 import fpl.domain.service.TeamParsingService;
 import fpl.utils.FplLogger;
 import fpl.domain.model.Team;
 import fpl.utils.OutputUtils;
-import fpl.utils.Utils;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.net.URI;
@@ -24,8 +24,8 @@ public class FplReportGenerator {
         System.setProperty("PLAYWRIGHT_BROWSERS_PATH", "browsers");
         AnsiConsole.systemInstall();
 
-        int totalStandingsPages = Utils.getEnteredPageCount();
-        Utils.terminateProgramIfNeeded(totalStandingsPages);
+        int totalStandingsPages = ConsoleService.getEnteredPageCount();
+        ConsoleService.terminateProgramIfNeeded(totalStandingsPages);
         FplLogger.writeProcessingLog(totalStandingsPages);
 
         logger.info("ℹ️ Starting to parse pages!!");
