@@ -10,7 +10,7 @@ import com.microsoft.playwright.options.WaitUntilState;
 import fpl.domain.model.Player;
 import fpl.arch.model.Position;
 import fpl.domain.model.Team;
-import fpl.utils.BoolUtils;
+import fpl.domain.utils.BoolUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

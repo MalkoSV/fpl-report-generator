@@ -1,6 +1,6 @@
 package fpl.domain.model;
 
-import fpl.utils.PlayerUtils;
+import fpl.domain.utils.PlayerUtils;
 
 import java.util.List;
 import java.util.stream.Stream;

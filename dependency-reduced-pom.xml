@@ -20,7 +20,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>fpl.FplReportGenerator</mainClass>
+                  <mainClass>fpl.app.FplReportGenerator</mainClass>
                 </transformer>
               </transformers>
             </configuration>

@@ -1,19 +1,16 @@
-package fpl;
+package fpl.app;
 
 import fpl.api.dto.BootstrapResponse;
 import fpl.api.dto.PlayerDto;
-import fpl.app.ConsoleService;
 import fpl.parser.BootstrapParser;
 import fpl.domain.service.TeamLinkService;
 import fpl.domain.service.TeamParsingService;
-import fpl.utils.FplLogger;
+import fpl.logging.FplLogger;
 import fpl.domain.model.Team;
-import fpl.utils.OutputUtils;
+import fpl.output.ReportExportService;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.net.URI;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -21,7 +18,6 @@ public class FplReportGenerator {
     private static final Logger logger = Logger.getLogger(FplReportGenerator.class.getName());
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("PLAYWRIGHT_BROWSERS_PATH", "browsers");
         AnsiConsole.systemInstall();
 
         int totalStandingsPages = ConsoleService.getEnteredPageCount();
@@ -42,13 +38,10 @@ public class FplReportGenerator {
         BootstrapResponse bootstrapResponse = BootstrapParser.parseBootstrap();
         List<PlayerDto> playersData = BootstrapParser.getPlayers(bootstrapResponse);
 
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));
-        String fileName = "FPL_Teams_top%d(%ds_duration)_%s.xlsx".formatted(
-                allTeamLinks.size(), (System.currentTimeMillis() - startTime) / 1000, timestamp);
-        OutputUtils.exportResultsToExcel(teams, playersData, fileName, args);
+        new ReportExportService().exportResults(teams, playersData, args);
 
         logger.info("⏱️ Completed in " + (System.currentTimeMillis() - startTime) / 1000 + "s");
         AnsiConsole.systemUninstall();
-        Thread.sleep(3000);
+        Thread.sleep(1000);
     }
 }

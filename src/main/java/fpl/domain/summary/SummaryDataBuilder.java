@@ -2,7 +2,7 @@ package fpl.domain.summary;
 
 import fpl.domain.model.Team;
 import fpl.domain.model.TeamSummary;
-import fpl.utils.TeamUtils;
+import fpl.domain.utils.TeamUtils;
 
 import java.util.List;
 

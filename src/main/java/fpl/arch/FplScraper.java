@@ -4,13 +4,11 @@ import fpl.api.dto.BootstrapResponse;
 import fpl.api.dto.PlayerDto;
 import fpl.app.ConsoleService;
 import fpl.parser.BootstrapParser;
-import fpl.utils.OutputUtils;
+import fpl.output.ReportExportService;
 import fpl.arch.scraper.TeamLinksScraper;
 import fpl.domain.model.Team;
 import org.fusesource.jansi.AnsiConsole;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -29,7 +27,6 @@ public class FplScraper {
             default -> System.out.printf("ℹ️  Processing the first %d teams...%n%n", standingsPageCount * 50);
         }
 
-
         logger.info("ℹ️ Starting to parse pages!!");
         long startTime = System.currentTimeMillis();
 
@@ -44,10 +41,7 @@ public class FplScraper {
         BootstrapResponse bootstrapResponse = BootstrapParser.parseBootstrap();
         List<PlayerDto> playersData = BootstrapParser.getPlayers(bootstrapResponse);
 
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"));
-        String fileName = "FPL_Teams_top%d(%ds_duration)_%s.xlsx".formatted(
-                allTeamLinks.size(), (System.currentTimeMillis() - startTime) / 1000, timestamp);
-        OutputUtils.exportResultsToExcel(teams, playersData, fileName, args);
+        ReportExportService.exportResults(teams, playersData, args);
 
         logger.info("⏱️ Completed in " + (System.currentTimeMillis() - startTime) / 1000 + "s");
         AnsiConsole.systemUninstall();

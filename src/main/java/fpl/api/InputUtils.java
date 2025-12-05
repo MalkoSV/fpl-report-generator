@@ -1,4 +1,4 @@
-package fpl.utils;
+package fpl.api;
 
 import java.util.Scanner;
 

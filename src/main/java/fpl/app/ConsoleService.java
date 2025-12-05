@@ -1,6 +1,6 @@
 package fpl.app;
 
-import fpl.utils.InputUtils;
+import fpl.api.InputUtils;
 
 import java.util.logging.Logger;
 

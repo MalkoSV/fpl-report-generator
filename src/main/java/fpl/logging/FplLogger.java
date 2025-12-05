@@ -1,4 +1,4 @@
-package fpl.utils;
+package fpl.logging;
 
 public class FplLogger {
 

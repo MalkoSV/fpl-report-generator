@@ -3,7 +3,7 @@ package fpl.parser;
 import fpl.api.FplApiEndPoints;
 import fpl.api.dto.LeagueResponse;
 import fpl.api.dto.TeamStats;
-import fpl.utils.InputUtils;
+import fpl.api.InputUtils;
 
 import java.util.ArrayList;
 import java.util.List;

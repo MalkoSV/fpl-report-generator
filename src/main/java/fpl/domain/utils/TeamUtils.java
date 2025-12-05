@@ -1,4 +1,4 @@
-package fpl.utils;
+package fpl.domain.utils;
 
 import fpl.domain.model.Player;
 import fpl.domain.model.Team;

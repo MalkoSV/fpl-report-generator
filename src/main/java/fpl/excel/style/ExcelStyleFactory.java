@@ -50,6 +50,8 @@ public class ExcelStyleFactory {
             Font font = workbook.createFont();
             font.setBold(true);
             style.setFont(font);
+            style.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
+            style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             style.setAlignment(HorizontalAlignment.LEFT);
             return style;
         });
@@ -58,7 +60,7 @@ public class ExcelStyleFactory {
     public CellStyle summaryValue() {
         return cache.computeIfAbsent("SUMMARY_VALUE", ignored -> {
             CellStyle style = workbook.createCellStyle();
-            style.setAlignment(HorizontalAlignment.LEFT);
+            style.setAlignment(HorizontalAlignment.RIGHT);
             return style;
         });
     }

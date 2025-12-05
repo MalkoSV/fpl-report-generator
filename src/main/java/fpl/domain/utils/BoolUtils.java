@@ -1,4 +1,4 @@
-package fpl.utils;
+package fpl.domain.utils;
 
 public class BoolUtils {
     private BoolUtils() {}

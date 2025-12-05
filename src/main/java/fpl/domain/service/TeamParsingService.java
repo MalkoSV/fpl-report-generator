@@ -7,7 +7,7 @@ import fpl.api.dto.PlayerDto;
 import fpl.domain.model.PositionType;
 import fpl.parser.BootstrapParser;
 import fpl.parser.EntryParser;
-import fpl.utils.BoolUtils;
+import fpl.domain.utils.BoolUtils;
 import fpl.domain.model.Player;
 import fpl.domain.model.Team;
 
@@ -130,12 +130,13 @@ public class TeamParsingService {
             }
 
             int done = doneCounter.incrementAndGet();
-            logger.info("✅ %d players, [%d/%d] (in %d sec) %s%n".formatted(
-                    picks.size(),
-                    done,
-                    totalUri,
-                    (System.currentTimeMillis() - startTime) / 1000, uri)
-            );
+            if (done % 100 == 1) {
+                System.out.printf("%n✅ Done [%d/%d] teams. Processing next.", done - 1, totalUri);
+            }
+            System.out.print(".");
+            if (done == totalUri) {
+                System.out.println();
+            }
 
             return new Team(
                     BoolUtils.asInt(hasTripleCaptain),

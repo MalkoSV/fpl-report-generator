@@ -28,28 +28,3 @@ public class OutputDirectoryResolver {
         return outDir;
     }
 }
-
-//fpl.excel
-//├── core/
-//        │     └── ExcelWriter.java
-//├── builder/
-//        │     ├── GenericSheetWriter.java
-//│     └── TableSheetWriter.java
-//├── sheets/
-//        │     ├── GameweekPlayersSheetWriter.java
-//│     ├── StartPlayersSheetWriter.java
-//│     ├── BenchPlayersSheetWriter.java
-//│     ├── DoubtfulPlayersSheetWriter.java
-//│     ├── HighBenchPointsSheetWriter.java
-//│     ├── CaptainPlayersSheetWriter.java
-//│     ├── PlayerStatsSheetWriter.java
-//│     └── SummarySheetWriter.java
-//├── summary/
-//        │     ├── SummaryData.java
-//│     └── SummaryTableWriter.java
-//├── style/
-//        │     └── ExcelStyleFactory.java
-//└── io/
-//        ├── WorkbookFactory.java
-//      └── FileNameGenerator.java
-
