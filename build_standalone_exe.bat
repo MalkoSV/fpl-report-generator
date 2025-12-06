@@ -5,8 +5,8 @@ chcp 65001 >nul
 setlocal enabledelayedexpansion
 
 set "ISCC=C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-set "ISS_FILE=fpl-scraper-standalone.iss"
-set "OUT_DIR=D:\fpl-scraper-out"
+set "ISS_FILE=fpl-report-generator-standalone.iss"
+set "OUT_DIR=D:\fpl-report-out"
 
 echo 🧱 Building installer via Inno Setup...
 "%ISCC%" "%ISS_FILE%"
@@ -16,7 +16,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-set "BAT_FILE=fpl-scraper-standalone.bat"
+set "BAT_FILE=fpl-report-generator-standalone.bat"
 
 if exist "%BAT_FILE%" (
     copy /Y "%BAT_FILE%" "%OUT_DIR%\%BAT_FILE%" >nul
