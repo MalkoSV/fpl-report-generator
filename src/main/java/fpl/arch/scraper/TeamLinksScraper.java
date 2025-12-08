@@ -88,8 +88,6 @@ public class TeamLinksScraper {
                             boolean foundCaptain = false;
                             boolean foundVice = false;
 
-                            String teamName = page.locator(SelectorService.TEAM_NAME_SELECTOR).innerText();
-
                             Locator transfersLocator = page.locator(SelectorService.TRANSFERS_COUNT_SELECTOR);
                             int transfers = Integer.parseInt(transfersLocator.innerText());
 
@@ -167,6 +165,10 @@ public class TeamLinksScraper {
                             }
 
                             Team currentTeam = new Team(
+                                    0,
+                                    0,
+                                    0,
+                                    0,
                                     BoolUtils.asInt(hasTripleCaptain),
                                     wildcard,
                                     BoolUtils.asInt(hasBenchBoost),

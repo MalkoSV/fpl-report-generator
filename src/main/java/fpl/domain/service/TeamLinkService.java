@@ -20,7 +20,7 @@ public final class TeamLinkService {
 
         return teams.stream()
                 .map(team -> FplApiEndPoints.getUri(
-                        FplApiEndPoints.TEAM,
+                        FplApiEndPoints.PICKS,
                         team.entry(),
                         event
                 ))

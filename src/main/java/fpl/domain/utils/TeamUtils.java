@@ -15,6 +15,12 @@ public class TeamUtils {
     public static TeamSummary calculateSummary(List<Team> teams) {
         return new TeamSummary(
                 teams.size(),
+                teams.stream().mapToInt(Team::points).min().orElse(0),
+                teams.stream().mapToInt(Team::points).max().orElse(0),
+                teams.stream().mapToDouble(Team::points).average().orElse(0.0),
+                teams.stream().mapToDouble(Team::pointsOnBench).average().orElse(0.0),
+                teams.stream().mapToDouble(Team::value).average().orElse(0.0),
+                teams.stream().mapToDouble(Team::bank).average().orElse(0.0),
                 teams.stream().mapToInt(Team::tripleCaptain).sum(),
                 teams.stream().mapToInt(Team::wildCard).sum(),
                 teams.stream().mapToInt(Team::benchBoost).sum(),

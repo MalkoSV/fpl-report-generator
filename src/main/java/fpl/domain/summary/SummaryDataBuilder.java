@@ -13,6 +13,12 @@ public class SummaryDataBuilder {
         return new SummaryData(
                 summary.count(),
                 summary.players().size(),
+                summary.minPoints(),
+                summary.maxPoints(),
+                summary.avgPoints(),
+                summary.avgPointsOnBench(),
+                summary.avgValue(),
+                summary.avgBank(),
                 summary.tripleCaptain(),
                 summary.wildcard(),
                 summary.benchBoost(),

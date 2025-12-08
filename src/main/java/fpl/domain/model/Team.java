@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public record Team(
+        int points,
+        int pointsOnBench,
+        int value,
+        int bank,
         int tripleCaptain,
         int wildCard,
         int benchBoost,

@@ -27,10 +27,19 @@ public class SummarySheetWriter extends GenericSheetWriter<SummaryData> {
         Object[][] baseInfo = {
                 {"Teams",          data.teamCount()},
                 {"Players",        data.playerCount()},
+                {"==CHIPS=====", "===="},
                 {"Triple Captain", data.tripleCaptainCount()},
                 {"Wildcard",       data.wildcardCount()},
                 {"Bench Boost",    data.benchBoostCount()},
-                {"Free Hit",       data.freeHitCount()}
+                {"Free Hit",       data.freeHitCount()},
+                {"==POINTS====", "===="},
+                {"Min points",     data.minPoints()},
+                {"Max points",     data.maxPoints()},
+                {"Avg points",     Math.round(data.avgPoints())},
+                {"Avg bench",      Math.round(data.avgPointsOnBench())},
+                {"==VALUE=====", "===="},
+                {"Avg value",      Math.round(data.avgValue())},
+                {"Avg bank",       Math.round(data.avgBank())}
         };
 
         writer.writeSimpleTable(0, baseCol, baseCol + 1, baseInfo);

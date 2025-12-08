@@ -7,7 +7,8 @@ public class FplApiEndPoints {
 
     public static final String BOOTSTRAP = "/bootstrap-static/";
     public static final String LEAGUE = "/leagues-classic/%d/standings/?page_standings=%d";
-    public static final String TEAM = "/entry/%d/event/%d/picks/";
+    public static final String PICKS = "/entry/%d/event/%d/picks/";
+    public static final String TRANSFERS = "/entry/%d/transfers/";
 
     public static final int OVERALL_LEAGUE_ID = 314;
     public static final int MALS_LEAGUE_ID = 1032011;

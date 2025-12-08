@@ -25,8 +25,6 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.collections4.ListUtils.partition;
-
 public class TeamParsingService {
 
     private static final Logger logger = Logger.getLogger(TeamParsingService.class.getName());
@@ -54,8 +52,6 @@ public class TeamParsingService {
         logger.info("🚀 Running in multi-threaded mode using " + threadCount + " threads...");
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-
-        List<List<URI>> partitions = partition(uris, (int) Math.ceil((double) uris.size() / threadCount));
 
         List<CompletableFuture<Team>> tasks = uris.stream()
                 .map(uri -> CompletableFuture.supplyAsync(
@@ -88,13 +84,15 @@ public class TeamParsingService {
             int totalUri
     ) {
         try {
-            long startTime = System.currentTimeMillis();
-
             EntryResponse entryResponse = EntryParser.parseEntry(uri);
             List<Pick> picks = EntryParser.getPicks(entryResponse);
             String activeChip = EntryParser.getActiveChip(entryResponse);
+            int points = EntryParser.getPoints(entryResponse);
+            int bank = EntryParser.getBank(entryResponse);
+            int value = EntryParser.getValue(entryResponse);
             int transfers = EntryParser.getEventTransfers(entryResponse);
             int transfersCost = EntryParser.getEventTransfersCost(entryResponse);
+            int pointsOnBench = EntryParser.getPointsOnBench(entryResponse);
 
             boolean hasBenchBoost = BENCH_BOOST.equalsIgnoreCase(activeChip);
             boolean hasFreeHit = FREE_HIT.equalsIgnoreCase(activeChip);
@@ -139,6 +137,10 @@ public class TeamParsingService {
             }
 
             return new Team(
+                    points,
+                    pointsOnBench,
+                    value,
+                    bank,
                     BoolUtils.asInt(hasTripleCaptain),
                     BoolUtils.asInt(hasWildcard),
                     BoolUtils.asInt(hasBenchBoost),

@@ -47,7 +47,7 @@ public class ReportExportService {
                 new DoubtfulPlayersSheetWriter(PlayerUtils.getDoubtfulPlayers(summary.players())),
                 new HighPointsBenchSheetWriter(PlayerUtils.getBenchPlayersWithHighPoints(summary.players())),
                 new SummarySheetWriter(summaryData),
-                new PlayerStatsSheetWriter(PlayerFilter.filter(playersData, 20, 3,1.2))
+                new PlayerStatsSheetWriter(PlayerFilter.filter(playersData, 25, 2,1.0))
                 );
     }
 }
