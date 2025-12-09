@@ -39,7 +39,7 @@ public class TeamParsingService {
         int totalUri = uris.size();
 
         int threadCount = Math.min(5, Runtime.getRuntime().availableProcessors());
-        logger.info("🚀 Running in multi-threaded mode using " + threadCount + " threads...");
+        logger.info("🚀 Running picks fetching in multi-threaded mode using " + threadCount + " threads...");
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
