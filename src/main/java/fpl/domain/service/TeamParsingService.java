@@ -39,7 +39,7 @@ public class TeamParsingService {
         int totalUris = (uris.size());
         ProgressBar progressBar = new ProgressBar(totalUris);
 
-        int threadCount = ThreadsUtils.getThreadsNumber(totalUris);
+        int threadCount = ThreadsUtils.getThreadsNumber();
         logger.info("🚀 Fetching picks using " + threadCount + " threads...");
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);

@@ -2,6 +2,7 @@ package fpl.domain.service;
 
 import fpl.api.dto.PlayerDto;
 import fpl.api.dto.TransferDto;
+import fpl.utils.RateLimiter;
 import fpl.utils.RetryUtils;
 import fpl.utils.ThreadsUtils;
 import fpl.domain.transfers.Transfer;
@@ -20,6 +21,7 @@ import java.util.logging.Logger;
 public class TransfersParsingService {
 
     private static final Logger logger = Logger.getLogger(TransfersParsingService.class.getName());
+    private static final RateLimiter RL = new RateLimiter(8.0);
 
     private TransfersParsingService() {}
 
@@ -27,14 +29,14 @@ public class TransfersParsingService {
         int totalUris = (uris.size());
         ProgressBar progressBar = new ProgressBar(totalUris);
 
-        int threadCount = ThreadsUtils.getThreadsNumber(totalUris);
+        int threadCount = ThreadsUtils.getThreadsNumber();
         logger.info("🚀 Fetching transfers using " + threadCount + " threads...");
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
         List<CompletableFuture<List<Transfer>>> tasks = uris.stream()
                 .map(uri -> CompletableFuture.supplyAsync(
-                        () -> processTransfersWithRetry(uri, playersById, event, progressBar),
+                        () -> processTransfersWithRetry(uri, playersById, event, progressBar, totalUris),
                         executorService
                 ))
                 .toList();
@@ -61,12 +63,16 @@ public class TransfersParsingService {
             URI uri,
             Map<Integer, PlayerDto> playersById,
             int event,
-            ProgressBar progressBar
+            ProgressBar progressBar,
+            int totalUris
     ) {
         try {
             List<TransferDto> transfers = RetryUtils.retry(
                     () -> {
                         try {
+                            if (totalUris > 5000) {
+                                RL.acquire();
+                            }
                             return TransfersParser.parse(uri, event);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
