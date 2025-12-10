@@ -46,7 +46,7 @@ public class FplReportGenerator {
         List<URI> transfersUris = LinkService.collectTeamTransfersEndpoints(entries);
         logger.info("✅ Successfully retrieved all team links (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");
 
-        logger.info("ℹ️ Collecting data from the team pages...");
+        logger.info("ℹ️ Collecting data from the pages...");
         List<Team> teams = TeamParsingService.collectStats(playersById, teamUris);
         List<Transfer> transfers = TransfersParsingService.collectTransfers(playersById, transfersUris, lastEvent);
 

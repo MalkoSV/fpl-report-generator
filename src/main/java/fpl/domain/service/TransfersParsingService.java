@@ -2,6 +2,8 @@ package fpl.domain.service;
 
 import fpl.api.dto.PlayerDto;
 import fpl.api.dto.TransferDto;
+import fpl.utils.RetryUtils;
+import fpl.utils.ThreadsUtils;
 import fpl.domain.transfers.Transfer;
 import fpl.logging.ProgressBar;
 import fpl.parser.TransfersParser;
@@ -19,21 +21,20 @@ public class TransfersParsingService {
 
     private static final Logger logger = Logger.getLogger(TransfersParsingService.class.getName());
 
-    private TransfersParsingService() {
-    }
+    private TransfersParsingService() {}
 
     public static List<Transfer> collectTransfers(Map<Integer, PlayerDto> playersById, List<URI> uris, int event) {
+        int totalUris = (uris.size());
+        ProgressBar progressBar = new ProgressBar(totalUris);
 
-        ProgressBar progressBar = new ProgressBar(uris.size());
-
-        int threadCount = Math.min(16, Runtime.getRuntime().availableProcessors() * 2);
-        logger.info("🚀 Gameweek transfers fetching in multi-threaded mode using " + threadCount + " threads...");
+        int threadCount = ThreadsUtils.getThreadsNumber(totalUris);
+        logger.info("🚀 Fetching transfers using " + threadCount + " threads...");
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
         List<CompletableFuture<List<Transfer>>> tasks = uris.stream()
                 .map(uri -> CompletableFuture.supplyAsync(
-                        () -> processTransfers(uri, playersById, progressBar, event),
+                        () -> processTransfersWithRetry(uri, playersById, event, progressBar),
                         executorService
                 ))
                 .toList();
@@ -56,14 +57,22 @@ public class TransfersParsingService {
         return transferList;
     }
 
-    private static List<Transfer> processTransfers(
+    private static List<Transfer> processTransfersWithRetry(
             URI uri,
             Map<Integer, PlayerDto> playersById,
-            ProgressBar progressBar,
-            int event
+            int event,
+            ProgressBar progressBar
     ) {
         try {
-            List<TransferDto> transfers = TransfersParser.parse(uri, event);
+            List<TransferDto> transfers = RetryUtils.retry(
+                    () -> {
+                        try {
+                            return TransfersParser.parse(uri, event);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+            );
 
             progressBar.step();
 
@@ -72,7 +81,7 @@ public class TransfersParsingService {
                     .toList();
 
         } catch (Exception e) {
-            logger.warning("⚠️ Error on " + uri + ": " + e.getMessage());
+            logger.warning("⚠️ Failed to fetch transfers for " + uri + ": " + e.getMessage());
 
             return List.of();
         }

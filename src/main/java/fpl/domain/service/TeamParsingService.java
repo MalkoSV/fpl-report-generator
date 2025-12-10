@@ -3,6 +3,8 @@ package fpl.domain.service;
 import fpl.api.dto.EntryResponse;
 import fpl.api.dto.Pick;
 import fpl.api.dto.PlayerDto;
+import fpl.utils.RetryUtils;
+import fpl.utils.ThreadsUtils;
 import fpl.domain.model.PositionType;
 import fpl.logging.ProgressBar;
 import fpl.parser.EntryParser;
@@ -34,17 +36,17 @@ public class TeamParsingService {
     }
 
     public static List<Team> collectStats(Map<Integer, PlayerDto> playersById, List<URI> uris) {
+        int totalUris = (uris.size());
+        ProgressBar progressBar = new ProgressBar(totalUris);
 
-        ProgressBar progressBar = new ProgressBar(uris.size());
-
-        int threadCount = Math.min(16, Runtime.getRuntime().availableProcessors() * 2);
-        logger.info("🚀 Running picks fetching in multi-threaded mode using " + threadCount + " threads...");
+        int threadCount = ThreadsUtils.getThreadsNumber(totalUris);
+        logger.info("🚀 Fetching picks using " + threadCount + " threads...");
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
         List<CompletableFuture<Team>> tasks = uris.stream()
                 .map(uri -> CompletableFuture.supplyAsync(
-                        () -> processTeam(uri, playersById, progressBar),
+                        () -> processTeamWithRetry(uri, playersById, progressBar),
                         executorService
                 ))
                 .toList();
@@ -66,13 +68,22 @@ public class TeamParsingService {
         return allTeamList;
     }
 
-    private static Team processTeam(
+    private static Team processTeamWithRetry(
             URI uri,
             Map<Integer, PlayerDto> playersById,
             ProgressBar progressBar
     ) {
         try {
-            EntryResponse entryResponse = EntryParser.parse(uri);
+            EntryResponse entryResponse = RetryUtils.retry(
+                    () -> {
+                        try {
+                            return EntryParser.parse(uri);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+            );
+
             List<Pick> picks = EntryParser.getPicks(entryResponse);
             String activeChip = EntryParser.getActiveChip(entryResponse);
             int points = EntryParser.getPoints(entryResponse);
