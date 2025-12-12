@@ -39,7 +39,7 @@ public class FplReportGenerator {
         List<PlayerDto> playersData = BootstrapParser.getPlayers(bootstrapResponse);
         Map<Integer, PlayerDto> playersById = PlayerUtils.getPlayersById(playersData);
 
-        logger.info("ℹ️ Fetching all team links...");
+        logger.info("ℹ️ Starting to fetch all team links...");
         List<EntryInfo> entries = StandingsParser.of(totalStandingsPages).parse();
 
         List<URI> teamUris = LinkService.collectTeamEndpoints(entries, lastEvent);
@@ -50,7 +50,7 @@ public class FplReportGenerator {
         List<Team> teams = TeamParsingService.collectStats(playersById, teamUris);
         List<Transfer> transfers = TransfersParsingService.collectTransfers(playersById, transfersUris, teams, lastEvent);
 
-        logger.info("ℹ️ Collecting players data from API...");
+        logger.info("ℹ️ Start to export result...");
 
         new ReportExportService().exportResults(teams, playersData, transfers, lastEvent, args);
 

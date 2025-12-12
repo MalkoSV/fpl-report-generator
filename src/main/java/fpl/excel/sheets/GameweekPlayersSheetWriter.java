@@ -16,7 +16,7 @@ public class GameweekPlayersSheetWriter extends TableSheetWriter<Player> {
             new Col<>("Triple", Player::getTripleCaptain),
             new Col<>("Vice", Player::getVice),
             new Col<>("Bench", p -> p.getCount() - p.getStart()),
-            new Col<>("Availability", Player::getAvailability),
+            new Col<>("AV", Player::getAvailability),
             new Col<>("Points", Player::getPoints)
     );
 

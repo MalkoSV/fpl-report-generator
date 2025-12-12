@@ -3,6 +3,7 @@ package fpl.excel.builder;
 import fpl.domain.model.HasPosition;
 import fpl.excel.style.ColorUtils;
 import fpl.excel.style.ExcelStyleFactory;
+import fpl.excel.utils.FormatUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -60,9 +61,11 @@ public class TableSheetWriter<T> extends GenericSheetWriter<List<T>> {
 
             }
         }
+        sheet.autoSizeColumn(0);
 
-        for (int i = 0; i < columns.size(); i++) {
-            sheet.autoSizeColumn(i);
+        int width = FormatUtils.calculateColumnWidth(columns);
+        for (int i = 1; i < columns.size(); i++) {
+            sheet.setColumnWidth(i, width);
         }
 
         return sheet;

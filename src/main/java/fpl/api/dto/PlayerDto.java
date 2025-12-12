@@ -2,9 +2,10 @@ package fpl.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import fpl.domain.model.HasPosition;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record PlayerDto(
+public record PlayerDto (
         String webName,
         int id,
         int elementType,
@@ -37,7 +38,13 @@ public record PlayerDto(
         Integer chanceOfPlayingThisRound,
         Integer chanceOfPlayingNextRound,
         String news
-) {
+)  implements HasPosition {
+
+    @Override
+    public int getPosition() {
+        return elementType;
+    }
+
     public int chanceSafe() {
         return chanceOfPlayingThisRound == null ? 100 : chanceOfPlayingThisRound;
     }

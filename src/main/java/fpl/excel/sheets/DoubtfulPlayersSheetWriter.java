@@ -12,7 +12,7 @@ public class DoubtfulPlayersSheetWriter extends TableSheetWriter<Player> {
             new Col<>("Name", Player::getName),
             new Col<>("Count", Player::getCount),
             new Col<>("Start", Player::getStart),
-            new Col<>("Availability", Player::getAvailability),
+            new Col<>("AV", Player::getAvailability),
             new Col<>("Points", Player::getPoints)
     );
 

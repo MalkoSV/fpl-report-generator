@@ -56,7 +56,7 @@ public class ReportExportService {
                 new HighPointsBenchSheetWriter(PlayerUtils.getBenchPlayersWithHighPoints(summary.players())),
                 new SummarySheetWriter(summaryData),
                 new TransfersSheetWriter(transfersData),
-                new PlayerStatsSheetWriter(PlayerFilter.filter(playersData, 25, 2.5,0.5))
+                new PlayerStatsSheetWriter(PlayerFilter.filter(playersData, 25, 2.75,0.1))
                 );
     }
 }
