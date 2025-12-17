@@ -1,16 +1,13 @@
 package fpl.domain.service;
 
-import fpl.api.dto.PlayerDto;
-import fpl.api.dto.TransferDto;
-import fpl.domain.mapper.TransferMapper;
+import fpl.api.mapper.TransferDtoMapper;
 import fpl.domain.model.Team;
-import fpl.utils.RetryUtils;
+import fpl.domain.repository.PlayerRepository;
+import fpl.domain.repository.TransferRepository;
 import fpl.utils.ThreadsUtils;
 import fpl.domain.transfers.Transfer;
 import fpl.logging.ProgressBar;
-import fpl.parser.TransfersParser;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -27,14 +24,13 @@ public class TransfersParsingService {
     private TransfersParsingService() {}
 
     public static List<Transfer> collectTransfers(
-            Map<Integer, PlayerDto> playersById,
-            List<URI> uris,
-            List<Team> teams,
-            int event
+            PlayerRepository players,
+            TransferRepository transferRepository,
+            int eventId,
+            List<Team> teams
     ) {
-
-        int totalUris = (uris.size());
-        ProgressBar progressBar = new ProgressBar(totalUris);
+        int totalTeams = teams.size();
+        ProgressBar progressBar = new ProgressBar(totalTeams);
 
         Map<Integer, Team> teamsByEntry = teams.stream()
                 .collect(Collectors.toMap(Team::entryId, team -> team));
@@ -46,9 +42,16 @@ public class TransfersParsingService {
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
-        List<CompletableFuture<List<Transfer>>> tasks = uris.stream()
-                .map(uri -> CompletableFuture.supplyAsync(
-                        () -> processTransfersWithRetry(uri, playersById, teamsByEntry, event, progressBar),
+        List<CompletableFuture<List<Transfer>>> tasks = teams.stream()
+                .map(team -> CompletableFuture.supplyAsync(
+                        () -> processTransfers(
+                                team.entryId(),
+                                players,
+                                teamsByEntry,
+                                transferRepository,
+                                eventId,
+                                progressBar
+                        ),
                         executorService
                 ))
                 .toList();
@@ -73,33 +76,25 @@ public class TransfersParsingService {
         return transferList;
     }
 
-    private static List<Transfer> processTransfersWithRetry(
-            URI uri,
-            Map<Integer, PlayerDto> playersById,
+    private static List<Transfer> processTransfers(
+            int teamId,
+            PlayerRepository playerRepository,
             Map<Integer, Team> teamsByEntry,
-            int event,
+            TransferRepository transferRepository,
+            int eventId,
             ProgressBar progressBar
     ) {
-        try {
-            List<TransferDto> transfers = RetryUtils.retry(
-                    () -> {
-                        try {
-                            return TransfersParser.parse(uri, event);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-            );
+        List<Transfer> transfers = transferRepository.getTransfers(teamId).stream()
+                .filter(dto -> dto.event() == eventId)
+                .map(dto -> TransferDtoMapper.fromDto(
+                        dto,
+                        playerRepository,
+                        teamsByEntry
+                ))
+                .toList();
+
             progressBar.step();
 
-            return transfers.stream()
-                    .map(dto -> TransferMapper.toDomain(dto, playersById, teamsByEntry))
-                    .toList();
-
-        } catch (Exception e) {
-            logger.warning("⚠️ Failed to fetch transfers for " + uri + ": " + e.getMessage());
-
-            return List.of();
-        }
+            return transfers;
     }
 }

@@ -1,7 +1,8 @@
 package fpl.domain.utils;
 
 import fpl.api.dto.PlayerDto;
-import fpl.domain.model.Player;
+import fpl.domain.model.SquadPlayer;
+import fpl.domain.stats.PlayerGameweekStats;
 
 import java.util.Comparator;
 import java.util.List;
@@ -10,70 +11,57 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PlayerUtils {
-    public static List<Player> mergePlayers(List<Player> players) {
+    public static List<PlayerGameweekStats> mergePlayers(List<SquadPlayer> players) {
         return players.stream()
+                .map(PlayerGameweekStats::from)
                 .collect(Collectors.toMap(
-                        Player::getName,
+                        PlayerGameweekStats::name,
                         Function.identity(),
-                        (p1, p2) -> new Player(
-                                p1.getName(),
-                                p1.getCount() + p2.getCount(),
-                                p1.getStart() + p2.getStart(),
-                                p1.getCaptain() + p2.getCaptain(),
-                                p1.getTripleCaptain() + p2.getTripleCaptain(),
-                                p1.getVice() + p2.getVice(),
-                                Math.min(p1.getPoints(), p2.getPoints()),
-                                p1.getAvailability(),
-                                p1.getPosition()
-                        )
-                ))
+                        PlayerGameweekStats::merge)
+                )
                 .values()
                 .stream()
                 .sorted(
-                        Comparator.comparing(Player::getCount).reversed()
-                                .thenComparing(Player::getName)
+                        Comparator.comparing(PlayerGameweekStats::count).reversed()
+                                .thenComparing(PlayerGameweekStats::name)
                 )
                 .toList();
     }
 
-    public static List<Player> getOnlyStartPlayers(List<Player> players) {
+    public static List<PlayerGameweekStats> getOnlyStartPlayers(List<PlayerGameweekStats> players) {
         return players.stream()
-                .filter(p -> p.getStart() == p.getCount())
+                .filter(p -> p.starts() == p.count())
                 .toList();
     }
 
-    public static List<Player> getOnlyBenchPlayers(List<Player> players) {
+    public static List<PlayerGameweekStats> getOnlyBenchPlayers(List<PlayerGameweekStats> players) {
         return players.stream()
-                .filter(p -> p.getStart() == 0)
+                .filter(p -> p.starts() == 0)
                 .toList();
     }
 
-    public static List<Player> getDoubtfulPlayers(List<Player> players) {
+    public static List<PlayerGameweekStats> getDoubtfulPlayers(List<PlayerGameweekStats> players) {
         return players.stream()
-                .filter(p -> p.getAvailability() <= 50)
+                .filter(p -> p.availability() <= 50)
                 .toList();
     }
 
-    public static List<Player> getBenchPlayersWithHighPoints(List<Player> players) {
+    public static List<PlayerGameweekStats> getBenchPlayersWithHighPoints(List<PlayerGameweekStats> players) {
         return players.stream()
-                .filter(p -> p.getCount() - p.getStart() > 0 && p.getPoints() > 5)
+                .filter(p -> p.count() - p.starts() > 0 && p.minPoints() > 5)
                 .toList();
     }
 
-    public static List<Player> getPlayersWhoCaptain(List<Player> players) {
+    public static List<PlayerGameweekStats> getPlayersWhoCaptain(List<PlayerGameweekStats> players) {
         return players.stream()
-                .filter(p -> p.getCaptain() > 0)
+                .filter(p -> p.captains() > 0)
                 .toList();
     }
 
-    public static long countStartPlayersWithZero(List<Player> players) {
+    public static long countStartPlayersWithZero(List<SquadPlayer> players) {
         return players.stream()
-                .filter(p -> p.getStart() == 1 && p.getPoints() <= 0)
+                .filter(p -> p.inStartingXI() && p.points() <= 0)
                 .count();
     }
 
-    public static Map<Integer, PlayerDto> getPlayersById(List<PlayerDto> playersData) {
-        return playersData.stream()
-                .collect(Collectors.toMap(PlayerDto::id, Function.identity()));
-    }
 }

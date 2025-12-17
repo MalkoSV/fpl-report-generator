@@ -17,11 +17,11 @@ public record Team(
         int freeHit,
         int transfers,
         int transfersCost,
-        List<Player> goalkeeper,
-        List<Player> defenders,
-        List<Player> midfielders,
-        List<Player> forwards,
-        List<Player> bench) {
+        List<SquadPlayer> goalkeeper,
+        List<SquadPlayer> defenders,
+        List<SquadPlayer> midfielders,
+        List<SquadPlayer> forwards,
+        List<SquadPlayer> bench) {
 
     public static long countStartPlayersWithZero(Team t) {
         return PlayerUtils.countStartPlayersWithZero(t.goalkeeper())
@@ -31,7 +31,7 @@ public record Team(
                 + PlayerUtils.countStartPlayersWithZero(t.bench());
     }
 
-    public Stream<Player> streamPlayers() {
+    public Stream<SquadPlayer> streamPlayers() {
         return Stream.of(
                         goalkeeper,
                         defenders,
@@ -41,5 +41,4 @@ public record Team(
                 )
                 .flatMap(List::stream);
     }
-
 }

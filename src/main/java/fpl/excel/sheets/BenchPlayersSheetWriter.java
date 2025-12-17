@@ -1,21 +1,22 @@
 package fpl.excel.sheets;
 
-import fpl.domain.model.Player;
+import fpl.domain.model.SquadPlayer;
+import fpl.domain.stats.PlayerGameweekStats;
 import fpl.excel.builder.Col;
 import fpl.excel.builder.TableSheetWriter;
 
 import java.util.List;
 
-public class BenchPlayersSheetWriter extends TableSheetWriter<Player> {
+public class BenchPlayersSheetWriter extends TableSheetWriter<PlayerGameweekStats> {
 
-    private static final List<Col<Player>> COLUMNS = List.of(
-            new Col<>("Name", Player::getName),
-            new Col<>("Count", Player::getCount),
-            new Col<>("Bench", p -> p.getCount() - p.getStart()),
-            new Col<>("Points", Player::getPoints)
+    private static final List<Col<PlayerGameweekStats>> COLUMNS = List.of(
+            new Col<>("Name", PlayerGameweekStats::name),
+            new Col<>("Count", PlayerGameweekStats::count),
+            new Col<>("Bench", p -> p.count() - p.starts()),
+            new Col<>("Points", PlayerGameweekStats::minPoints)
     );
 
-    public BenchPlayersSheetWriter(List<Player> players) {
+    public BenchPlayersSheetWriter(List<PlayerGameweekStats> players) {
         super("Only Bench", players, COLUMNS);
     }
 }

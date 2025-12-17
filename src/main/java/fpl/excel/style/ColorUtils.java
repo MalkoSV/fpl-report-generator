@@ -7,6 +7,6 @@ public class ColorUtils {
     private ColorUtils() {}
 
     public static Color getColorForCell(HasPosition item) {
-        return PlayerColorMapper.getColorForPlayer(item.getPosition());
+        return PlayerColorMapper.getColorForPlayer(item.getPosition().code());
     }
 }

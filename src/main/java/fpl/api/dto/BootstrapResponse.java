@@ -7,5 +7,5 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record BootstrapResponse(
         List<PlayerDto> elements,
-        List<Event> events
+        List<EventDto> events
 ) {}

@@ -1,45 +1,45 @@
 package fpl.excel.sheets;
 
-import fpl.api.dto.PlayerDto;
 import fpl.excel.builder.Col;
 import fpl.excel.builder.TableSheetWriter;
+import fpl.domain.model.PlayerSeasonView;
 
 import java.util.List;
 
-public class PlayerStatsSheetWriter extends TableSheetWriter<PlayerDto> {
+public class PlayerStatsSheetWriter extends TableSheetWriter<PlayerSeasonView> {
 
-    private static final List<Col<PlayerDto>> COLUMNS = List.of(
-            new Col<>("Name", PlayerDto::webName),
-            new Col<>("Points", PlayerDto::totalPoints),
-            new Col<>("PPM", PlayerDto::pointsPerGame),
-            new Col<>("Form", PlayerDto::form),
-            new Col<>("F_Rank", PlayerDto::formRankType),
-            new Col<>("Round", PlayerDto::eventPoints),
-            new Col<>("Rnd-F", p -> p.eventPoints() - p.form()),
-            new Col<>("Bonus", PlayerDto::bonus),
-            new Col<>("Min", PlayerDto::minutes),
-            new Col<>("Starts", PlayerDto::starts),
-            new Col<>("CShts", PlayerDto::cleanSheets),
-            new Col<>("DC", PlayerDto::defensiveContribution),
-            new Col<>("DC(90)", PlayerDto::defensiveContributionPer90),
-            new Col<>("G", PlayerDto::goalsScored),
-            new Col<>("A", PlayerDto::assists),
+    private static final List<Col<PlayerSeasonView>> COLUMNS = List.of(
+            new Col<>("Name", PlayerSeasonView::fullName),
+            new Col<>("Points", PlayerSeasonView::totalPoints),
+            new Col<>("PPM", PlayerSeasonView::pointsPerGame),
+            new Col<>("Form", PlayerSeasonView::form),
+            new Col<>("F_Rank", PlayerSeasonView::formRank),
+            new Col<>("Round", PlayerSeasonView::lastEventPoints),
+            new Col<>("Rnd-F", p -> p.lastEventPoints() - p.form()),
+            new Col<>("Bonus", PlayerSeasonView::totalBonus),
+            new Col<>("Min", PlayerSeasonView::minutes),
+            new Col<>("Starts", PlayerSeasonView::starts),
+            new Col<>("CleanS", PlayerSeasonView::cleanSheets),
+            new Col<>("DC", PlayerSeasonView::defensiveContribution),
+            new Col<>("DC(90)", PlayerSeasonView::defensiveContributionPer90),
+            new Col<>("G", PlayerSeasonView::goalsScored),
+            new Col<>("A", PlayerSeasonView::assists),
             new Col<>("G+A", p -> p.goalsScored() + p.assists()),
-            new Col<>("xG", PlayerDto::expectedGoals),
-            new Col<>("xA", PlayerDto::expectedAssists),
-            new Col<>("xGI", PlayerDto::expectedGoalInvolvements),
-            new Col<>("GA-xGI", p -> p.goalsScored() + p.assists() - p.expectedGoalInvolvements()),
-            new Col<>("#Corn", PlayerDto::cornersAndIndirectFreekicksOrder),
-            new Col<>("#Free", PlayerDto::directFreekicksOrder),
-            new Col<>("#Pen", PlayerDto::penaltiesOrder),
-            new Col<>("% sel", PlayerDto::selectedByPercent),
+            new Col<>("xG", PlayerSeasonView::xG),
+            new Col<>("xA", PlayerSeasonView::xA),
+            new Col<>("xGI", PlayerSeasonView::xGI),
+            new Col<>("GA-xGI", p -> p.goalsScored() + p.assists() - p.xGI()),
+            new Col<>("#Pen", PlayerSeasonView::penaltiesOrder),
+            new Col<>("#Kick", PlayerSeasonView::directFreekicksOrder),
+            new Col<>("#Corn", PlayerSeasonView::otherFreekicksOrder),
+            new Col<>("% sel", PlayerSeasonView::selectedByPercent),
             new Col<>("Cost", p -> p.nowCost() / 10.0),
-            new Col<>("Val(S)", PlayerDto::valueSeason),
-            new Col<>("Val(F)", PlayerDto::valueForm),
-            new Col<>("News", PlayerDto::news)
+            new Col<>("Val(S)", PlayerSeasonView::valueSeason),
+            new Col<>("Val(F)", PlayerSeasonView::valueForm),
+            new Col<>("News", PlayerSeasonView::lastNews)
     );
 
-    public PlayerStatsSheetWriter(List<PlayerDto> players) {
+    public PlayerStatsSheetWriter(List<PlayerSeasonView> players) {
         super("Player Stats", players, COLUMNS);
     }
 }

@@ -1,26 +1,26 @@
 package fpl.excel.sheets;
 
-import fpl.domain.model.Player;
+import fpl.domain.stats.PlayerGameweekStats;
 import fpl.excel.builder.Col;
 import fpl.excel.builder.TableSheetWriter;
 
 import java.util.List;
 
-public class GameweekPlayersSheetWriter extends TableSheetWriter<Player> {
+public class GameweekPlayersSheetWriter extends TableSheetWriter<PlayerGameweekStats> {
 
-    private static final List<Col<Player>> COLUMNS = List.of(
-            new Col<>("Name", Player::getName),
-            new Col<>("Count", Player::getCount),
-            new Col<>("Start", Player::getStart),
-            new Col<>("Captain", Player::getCaptain),
-            new Col<>("Triple", Player::getTripleCaptain),
-            new Col<>("Vice", Player::getVice),
-            new Col<>("Bench", p -> p.getCount() - p.getStart()),
-            new Col<>("AV", Player::getAvailability),
-            new Col<>("Points", Player::getPoints)
+    private static final List<Col<PlayerGameweekStats>> COLUMNS = List.of(
+            new Col<>("Name", PlayerGameweekStats::name),
+            new Col<>("Count", PlayerGameweekStats::count),
+            new Col<>("Start", PlayerGameweekStats::starts),
+            new Col<>("Captain", PlayerGameweekStats::captains),
+            new Col<>("Triple", PlayerGameweekStats::tripleCaptains),
+            new Col<>("Vice", PlayerGameweekStats::viceCaptains),
+            new Col<>("Bench", p -> p.count() - p.starts()),
+            new Col<>("AV", PlayerGameweekStats::availability),
+            new Col<>("Points", PlayerGameweekStats::minPoints)
     );
 
-    public GameweekPlayersSheetWriter(List<Player> players) {
+    public GameweekPlayersSheetWriter(List<PlayerGameweekStats> players) {
         super("Gameweek players", players, COLUMNS);
     }
 }

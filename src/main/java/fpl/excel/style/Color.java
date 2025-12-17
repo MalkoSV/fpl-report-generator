@@ -5,8 +5,8 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 public enum Color {
     LIGHT_YELLOW(IndexedColors.LIGHT_YELLOW.getIndex()),
     LIGHT_ORANGE(IndexedColors.LIGHT_ORANGE.getIndex()),
-    LIGHT_TURQUOISE(IndexedColors.LIGHT_TURQUOISE.getIndex()),
-    LIGHT_CORNFLOWER_BLUE(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
+    TURQUOISE(IndexedColors.TURQUOISE.getIndex()),
+    CORNFLOWER_BLUE(IndexedColors.CORNFLOWER_BLUE.getIndex());
 
     private final short colorIndex;
 

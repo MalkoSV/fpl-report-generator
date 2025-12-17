@@ -8,5 +8,5 @@ import java.util.List;
 public record EntryResponse(
         String activeChip,
         EntryHistory entryHistory,
-        List<Pick> picks
+        List<PickDto> picks
 ) {}

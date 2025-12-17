@@ -1,8 +1,8 @@
 package fpl.output;
 
+import fpl.domain.model.PlayerSeasonView;
 import fpl.domain.transfers.Transfer;
-import fpl.domain.summary.SummaryData;
-import fpl.domain.summary.SummaryDataBuilder;
+import fpl.domain.stats.SummaryData;
 import fpl.domain.transfers.TransfersData;
 import fpl.domain.transfers.TransfersDataBuilder;
 import fpl.excel.core.ExcelWriter;
@@ -17,11 +17,10 @@ import fpl.excel.sheets.StartPlayersSheetWriter;
 import fpl.excel.sheets.PlayerStatsSheetWriter;
 import fpl.excel.sheets.SummarySheetWriter;
 import fpl.domain.utils.PlayerFilter;
-import fpl.api.dto.PlayerDto;
 import fpl.domain.model.Team;
-import fpl.domain.model.TeamSummary;
+import fpl.domain.stats.TeamSummary;
 import fpl.domain.utils.PlayerUtils;
-import fpl.domain.utils.TeamUtils;
+import fpl.domain.stats.TeamStatsService;
 import fpl.excel.sheets.TransfersSheetWriter;
 
 import java.util.List;
@@ -30,7 +29,7 @@ public class ReportExportService {
 
     public void exportResults(
             List<Team> teams,
-            List<PlayerDto> playersData,
+            List<PlayerSeasonView> playersData,
             List<Transfer> transfers,
             int event,
             String[] args) {
@@ -41,8 +40,8 @@ public class ReportExportService {
                 new FileNameGenerator()
         );
 
-        TeamSummary summary = TeamUtils.calculateSummary(teams);
-        SummaryData summaryData = new SummaryDataBuilder().build(teams, summary);
+        TeamSummary summary = TeamStatsService.calculateSummary(teams);
+        SummaryData summaryData = SummaryData.from(teams, summary);
         TransfersData transfersData = new TransfersDataBuilder().build(transfers);
 
         writer.writeExcel(

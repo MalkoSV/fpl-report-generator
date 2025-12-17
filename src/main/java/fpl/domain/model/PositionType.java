@@ -18,4 +18,8 @@ public enum PositionType {
             default -> throw new IllegalArgumentException("Unknown code: " + code);
         };
     }
+
+    public int code() {
+        return code;
+    }
 }
