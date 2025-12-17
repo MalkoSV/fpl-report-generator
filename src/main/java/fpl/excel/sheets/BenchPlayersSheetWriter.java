@@ -1,6 +1,5 @@
 package fpl.excel.sheets;
 
-import fpl.domain.model.SquadPlayer;
 import fpl.domain.stats.PlayerGameweekStats;
 import fpl.excel.builder.Col;
 import fpl.excel.builder.TableSheetWriter;

@@ -1,12 +1,10 @@
 package fpl.domain.utils;
 
-import fpl.api.dto.PlayerDto;
 import fpl.domain.model.SquadPlayer;
 import fpl.domain.stats.PlayerGameweekStats;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

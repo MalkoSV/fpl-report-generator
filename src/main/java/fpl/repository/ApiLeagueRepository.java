@@ -1,9 +1,7 @@
 package fpl.repository;
 
 import fpl.api.FplApiClient;
-import fpl.api.dto.EntryResponse;
 import fpl.api.dto.LeagueResponse;
-import fpl.domain.repository.EntryRepository;
 import fpl.domain.repository.LeagueRepository;
 
 public class ApiLeagueRepository implements LeagueRepository {

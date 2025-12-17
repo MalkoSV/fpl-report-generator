@@ -1,9 +1,7 @@
 package fpl.repository;
 
 import fpl.api.FplApiClient;
-import fpl.api.dto.LeagueResponse;
 import fpl.api.dto.TransferDto;
-import fpl.domain.repository.LeagueRepository;
 import fpl.domain.repository.TransferRepository;
 
 import java.util.List;
