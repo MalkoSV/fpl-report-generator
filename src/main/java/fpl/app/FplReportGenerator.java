@@ -2,6 +2,7 @@ package fpl.app;
 
 import fpl.api.FplApiClient;
 import fpl.api.FplApiFactory;
+import fpl.app.config.LeagueSelection;
 import fpl.app.config.LeagueSelectionPolicy;
 import fpl.context.BootstrapContext;
 import fpl.domain.model.PlayerSeasonView;
@@ -12,8 +13,8 @@ import fpl.domain.usecase.FetchTeamIdsUseCase;
 import fpl.domain.usecase.AssembleTeamsUseCase;
 import fpl.domain.transfers.Transfer;
 import fpl.domain.usecase.ParseTransfersUseCase;
-import fpl.logging.FplLogger;
 import fpl.domain.model.Team;
+import fpl.logging.ProcessingLogger;
 import fpl.output.ReportExportService;
 import fpl.repository.ApiEntryRepository;
 import fpl.repository.ApiLeagueRepository;
@@ -31,12 +32,11 @@ public class FplReportGenerator {
         AnsiConsole.systemInstall();
 
         var pagesCountConsole = new PagesCountConsole();
-        int mode = pagesCountConsole.askPagesCount();
+        int input = pagesCountConsole.askPagesCount();
 
-        int pages = LeagueSelectionPolicy.resolvePages(mode);
-        int leagueId = LeagueSelectionPolicy.resolveLeagueId(mode);
+        LeagueSelection selection = LeagueSelectionPolicy.resolve(input);
 
-        FplLogger.writeProcessingLog(pages);
+        ProcessingLogger.logStart(selection.description());
 
         logger.info("ℹ️ Starting to parse pages!!");
         long startTime = System.currentTimeMillis();
@@ -53,8 +53,8 @@ public class FplReportGenerator {
 
         FetchTeamIdsUseCase fetchTeamIdsUseCase = new FetchTeamIdsUseCase(leagueRepository);
         List<Integer> entryIds = fetchTeamIdsUseCase.execute(
-                leagueId,
-                pages
+                selection.leagueId(),
+                selection.pages()
         );
 
         logger.info("✅ Successfully retrieved all team links (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");

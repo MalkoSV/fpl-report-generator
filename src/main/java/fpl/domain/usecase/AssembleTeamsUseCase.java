@@ -1,6 +1,7 @@
 package fpl.domain.usecase;
 
 import fpl.api.mapper.PickDtoMapper;
+import fpl.app.config.AppLimits;
 import fpl.domain.model.Pick;
 import fpl.domain.model.SquadPlayer;
 import fpl.domain.model.PlayerSeasonView;
@@ -10,7 +11,6 @@ import fpl.domain.repository.EntryRepository;
 import fpl.domain.repository.PlayerRepository;
 import fpl.logging.ProgressBar;
 import fpl.utils.BoolUtils;
-import fpl.utils.ThreadsUtils;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -35,7 +35,7 @@ public class AssembleTeamsUseCase {
 
         ProgressBar progressBar = new ProgressBar(entryIds.size());
 
-        int threadCount = ThreadsUtils.getThreadsNumber();
+        int threadCount = AppLimits.getThreadsNumber();
         logger.info("🚀 Starting to fetch picks using " + threadCount + " threads...");
 
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);

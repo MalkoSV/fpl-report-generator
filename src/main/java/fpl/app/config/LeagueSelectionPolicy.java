@@ -2,8 +2,6 @@ package fpl.app.config;
 
 public final class LeagueSelectionPolicy {
 
-    public static final int MAX_PAGES = 200;
-
     public static final int MALS_MODE = 201;
     public static final int PROGNOZILLA_MODE = 202;
 
@@ -13,15 +11,25 @@ public final class LeagueSelectionPolicy {
 
     private LeagueSelectionPolicy() {}
 
-    public static int resolvePages(int mode) {
-        return mode <= MAX_PAGES ? mode : 1;
-    }
+    public static LeagueSelection resolve(int userInput) {
+        return switch (userInput) {
+            case MALS_MODE -> new LeagueSelection(
+                    MALS_LEAGUE_ID,
+                    1,
+                    "ℹ️ Processing Mals League teams..."
 
-    public static int resolveLeagueId(int mode) {
-        return switch (mode) {
-            case MALS_MODE -> MALS_LEAGUE_ID;
-            case PROGNOZILLA_MODE -> PROGNOZILLA_LEAGUE_ID;
-            default -> OVERALL_LEAGUE_ID;
+            );
+            case PROGNOZILLA_MODE -> new LeagueSelection(
+                    PROGNOZILLA_LEAGUE_ID,
+                    1,
+                    "ℹ️ Processing Prognozilla league teams..."
+            );
+            default -> new LeagueSelection(
+                    OVERALL_LEAGUE_ID,
+                    userInput,
+                    "ℹ️ Processing Overall league teams (first %d teams)..."
+                            .formatted(userInput * AppLimits.TEAMS_PER_PAGE)
+            );
         };
     }
 }

@@ -1,10 +1,10 @@
 package fpl.domain.usecase;
 
 import fpl.api.mapper.TransferDtoMapper;
+import fpl.app.config.AppLimits;
 import fpl.domain.model.Team;
 import fpl.domain.repository.PlayerRepository;
 import fpl.domain.repository.TransferRepository;
-import fpl.utils.ThreadsUtils;
 import fpl.domain.transfers.Transfer;
 import fpl.logging.ProgressBar;
 
@@ -35,7 +35,7 @@ public class ParseTransfersUseCase {
         Map<Integer, Team> teamsByEntry = teams.stream()
                 .collect(Collectors.toMap(Team::entryId, team -> team));
 
-        int threadCount = ThreadsUtils.getThreadsNumber();
+        int threadCount = AppLimits.getThreadsNumber();
 
         logger.info("🚀 Starting to fetch transfers (using %s threads)...".formatted(threadCount));
         long startTime = System.currentTimeMillis();
