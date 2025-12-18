@@ -4,7 +4,7 @@ import fpl.domain.model.HasPosition;
 import fpl.domain.model.SquadPlayer;
 import fpl.domain.model.PositionType;
 
-public record PlayerGameweekStats(
+public record PlayerGameweekSummary(
         String name,
         PositionType position,
         int count,
@@ -16,8 +16,8 @@ public record PlayerGameweekStats(
         int availability
 ) implements HasPosition {
 
-    public static PlayerGameweekStats from(SquadPlayer p) {
-        return new PlayerGameweekStats(
+    public static PlayerGameweekSummary from(SquadPlayer p) {
+        return new PlayerGameweekSummary(
                 p.name(),
                 p.position(),
                 1,
@@ -30,8 +30,8 @@ public record PlayerGameweekStats(
         );
     }
 
-    public PlayerGameweekStats merge(PlayerGameweekStats other) {
-        return new PlayerGameweekStats(
+    public PlayerGameweekSummary merge(PlayerGameweekSummary other) {
+        return new PlayerGameweekSummary(
                 name,
                 position,
                 count + other.count,

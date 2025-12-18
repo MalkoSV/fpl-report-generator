@@ -20,7 +20,7 @@ import fpl.domain.filters.PlayerSeasonStatsFilter;
 import fpl.domain.model.Team;
 import fpl.domain.stats.TeamSummary;
 import fpl.domain.filters.PlayerGameweekStatsFilter;
-import fpl.domain.stats.TeamStatsService;
+import fpl.domain.stats.TeamStats;
 import fpl.excel.sheets.TransfersSheetWriter;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class ReportExportService {
                 new FileNameGenerator()
         );
 
-        TeamSummary summary = TeamStatsService.calculateSummary(teams);
+        TeamSummary summary = TeamStats.calculateSummary(teams);
         SummaryData summaryData = SummaryData.from(teams, summary);
         TransfersData transfersData = new TransfersDataBuilder().build(transfers);
 

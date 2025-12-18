@@ -11,19 +11,19 @@ public class PlayerGameweekStatsMerger {
 
     private PlayerGameweekStatsMerger() {}
 
-    public static List<PlayerGameweekStats> mergePlayers(List<SquadPlayer> players) {
+    public static List<PlayerGameweekSummary> mergePlayers(List<SquadPlayer> players) {
         return players.stream()
-                .map(PlayerGameweekStats::from)
+                .map(PlayerGameweekSummary::from)
                 .collect(Collectors.toMap(
-                        PlayerGameweekStats::name,
+                        PlayerGameweekSummary::name,
                         Function.identity(),
-                        PlayerGameweekStats::merge)
+                        PlayerGameweekSummary::merge)
                 )
                 .values()
                 .stream()
                 .sorted(
-                        Comparator.comparing(PlayerGameweekStats::count).reversed()
-                                .thenComparing(PlayerGameweekStats::name)
+                        Comparator.comparing(PlayerGameweekSummary::count).reversed()
+                                .thenComparing(PlayerGameweekSummary::name)
                 )
                 .toList();
     }

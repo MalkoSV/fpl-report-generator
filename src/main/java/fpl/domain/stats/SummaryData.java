@@ -40,10 +40,10 @@ public record SummaryData(
                 summary.benchBoost(),
                 summary.freeHit(),
 
-                TeamStatsService.countZeroPointPlayers(teams),
-                TeamStatsService.countTransfers(teams),
-                TeamStatsService.sumTransfersCost(teams),
-                TeamStatsService.groupFormations(teams)
+                TeamStats.countZeroPointPlayers(teams),
+                TeamStats.countTransfers(teams),
+                TeamStats.sumTransfersCost(teams),
+                TeamStats.groupFormations(teams)
         );
     }
 }

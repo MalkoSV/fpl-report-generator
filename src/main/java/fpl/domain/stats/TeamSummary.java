@@ -14,6 +14,6 @@ public record TeamSummary(
         int wildcard,
         int benchBoost,
         int freeHit,
-        List<PlayerGameweekStats> players
+        List<PlayerGameweekSummary> players
 ) {
 }

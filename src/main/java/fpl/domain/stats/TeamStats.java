@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class TeamStatsService {
+public class TeamStats {
 
     public static TeamSummary calculateSummary(List<Team> teams) {
         return new TeamSummary(
