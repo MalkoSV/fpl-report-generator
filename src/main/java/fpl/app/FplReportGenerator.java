@@ -9,9 +9,9 @@ import fpl.domain.repository.EntryRepository;
 import fpl.domain.repository.LeagueRepository;
 import fpl.domain.repository.TransferRepository;
 import fpl.domain.usecase.FetchTeamIdsUseCase;
-import fpl.domain.service.TeamAssemblyService;
+import fpl.domain.usecase.AssembleTeamsUseCase;
 import fpl.domain.transfers.Transfer;
-import fpl.domain.service.TransfersParsingService;
+import fpl.domain.usecase.ParseTransfersUseCase;
 import fpl.logging.FplLogger;
 import fpl.domain.model.Team;
 import fpl.output.ReportExportService;
@@ -60,14 +60,14 @@ public class FplReportGenerator {
         logger.info("✅ Successfully retrieved all team links (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");
 
         logger.info("ℹ️ Collecting data from the pages...");
-        List<Team> teams = TeamAssemblyService.collectTeamStats(
+        List<Team> teams = AssembleTeamsUseCase.collectTeamStats(
                 bootstrapContext.players(),
                 entryRepository,
                 eventId,
                 entryIds
         );
 
-        List<Transfer> transfers = TransfersParsingService.collectTransfers(
+        List<Transfer> transfers = ParseTransfersUseCase.collectTransfers(
                 bootstrapContext.players(),
                 transferRepository,
                 eventId,

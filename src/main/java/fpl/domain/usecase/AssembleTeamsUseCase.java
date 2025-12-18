@@ -1,4 +1,4 @@
-package fpl.domain.service;
+package fpl.domain.usecase;
 
 import fpl.api.mapper.PickDtoMapper;
 import fpl.domain.model.Pick;
@@ -21,11 +21,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-public class TeamAssemblyService {
+public class AssembleTeamsUseCase {
 
-    private static final Logger logger = Logger.getLogger(TeamAssemblyService.class.getName());
+    private static final Logger logger = Logger.getLogger(AssembleTeamsUseCase.class.getName());
 
-    private TeamAssemblyService() {}
+    private AssembleTeamsUseCase() {}
 
     public static List<Team> collectTeamStats(
             PlayerRepository players,

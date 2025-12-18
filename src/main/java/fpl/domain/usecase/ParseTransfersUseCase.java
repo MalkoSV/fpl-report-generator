@@ -1,4 +1,4 @@
-package fpl.domain.service;
+package fpl.domain.usecase;
 
 import fpl.api.mapper.TransferDtoMapper;
 import fpl.domain.model.Team;
@@ -17,11 +17,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class TransfersParsingService {
+public class ParseTransfersUseCase {
 
-    private static final Logger logger = Logger.getLogger(TransfersParsingService.class.getName());
+    private static final Logger logger = Logger.getLogger(ParseTransfersUseCase.class.getName());
 
-    private TransfersParsingService() {}
+    private ParseTransfersUseCase() {}
 
     public static List<Transfer> collectTransfers(
             PlayerRepository players,
