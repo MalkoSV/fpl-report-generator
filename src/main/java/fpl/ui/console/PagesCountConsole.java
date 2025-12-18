@@ -1,5 +1,7 @@
 package fpl.ui.console;
 
+import fpl.app.config.AppLimits;
+
 import java.util.logging.Logger;
 
 public class PagesCountConsole {
@@ -21,7 +23,7 @@ public class PagesCountConsole {
         return ConsoleInput.readNumber(
                 ConsoleTexts.DESCRIPTION_FOR_ENTER_PAGE_NUMBER,
                 0,
-                202
+                AppLimits.MAX_MODE
         );
     }
 

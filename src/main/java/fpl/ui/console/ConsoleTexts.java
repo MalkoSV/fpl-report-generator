@@ -2,16 +2,11 @@ package fpl.ui.console;
 
 public final class ConsoleTexts {
 
-    private static final String RESET = "\u001B[0m";
-    private static final String YELLOW = "\u001B[33m";
-    private static final String CYAN = "\u001B[36m";
-    private static final String BOLD = "\u001B[1m";
-
-    public static final String DESCRIPTION_FOR_ENTER_PAGE_NUMBER = CYAN + """
+    public static final String DESCRIPTION_FOR_ENTER_PAGE_NUMBER = AnsiColors.CYAN + """
             =======================================================
              ⚽ FPL PARSER
             =======================================================
-            """ + RESET + """                         
+            """ + AnsiColors.RESET + """                         
             Every standings page displays names of 50 teams.
             
             1 - 1-50 positions
@@ -21,10 +16,10 @@ public final class ConsoleTexts {
             =======================================================
             201 - Mals League
             202 - Prognozilla
-            """ + CYAN + """
+            """ + AnsiColors.CYAN + """
             =======================================================
-            """ + RESET + BOLD + YELLOW + """
-            Enter the number of pages to parse (0 - exit):\s""" + RESET;
+            """ + AnsiColors.RESET + AnsiColors.BOLD + AnsiColors.YELLOW + """
+            Enter the number of pages to parse (0 - exit):\s""" + AnsiColors.RESET;
 
     private ConsoleTexts() {}
 }
