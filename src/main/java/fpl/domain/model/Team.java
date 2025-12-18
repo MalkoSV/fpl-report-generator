@@ -1,6 +1,6 @@
 package fpl.domain.model;
 
-import fpl.domain.utils.PlayerUtils;
+import fpl.domain.stats.SquadStats;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -24,11 +24,11 @@ public record Team(
         List<SquadPlayer> bench) {
 
     public static long countStartPlayersWithZero(Team t) {
-        return PlayerUtils.countStartPlayersWithZero(t.goalkeeper())
-                + PlayerUtils.countStartPlayersWithZero(t.defenders())
-                + PlayerUtils.countStartPlayersWithZero(t.midfielders())
-                + PlayerUtils.countStartPlayersWithZero(t.forwards())
-                + PlayerUtils.countStartPlayersWithZero(t.bench());
+        return SquadStats.countStartPlayersWithZero(t.goalkeeper())
+                + SquadStats.countStartPlayersWithZero(t.defenders())
+                + SquadStats.countStartPlayersWithZero(t.midfielders())
+                + SquadStats.countStartPlayersWithZero(t.forwards())
+                + SquadStats.countStartPlayersWithZero(t.bench());
     }
 
     public Stream<SquadPlayer> streamPlayers() {

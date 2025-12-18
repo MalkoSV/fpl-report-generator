@@ -81,7 +81,7 @@ public class TeamAssemblyService {
                 .toList();
 
         for (var pick : picks) {
-            PlayerSeasonView view = playerRepository.getById(pick.elementId());
+            PlayerSeasonView view = playerRepository.getById(pick.playerId());
             SquadPlayer player = new SquadPlayer(view, pick);
             PositionType pos = view.position();
 

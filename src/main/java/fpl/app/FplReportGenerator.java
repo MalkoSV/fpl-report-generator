@@ -2,12 +2,13 @@ package fpl.app;
 
 import fpl.api.FplApiClient;
 import fpl.api.FplApiFactory;
+import fpl.app.config.LeagueSelectionPolicy;
 import fpl.context.BootstrapContext;
 import fpl.domain.model.PlayerSeasonView;
 import fpl.domain.repository.EntryRepository;
 import fpl.domain.repository.LeagueRepository;
 import fpl.domain.repository.TransferRepository;
-import fpl.domain.service.StandingsParsingService;
+import fpl.domain.usecase.FetchTeamIdsUseCase;
 import fpl.domain.service.TeamAssemblyService;
 import fpl.domain.transfers.Transfer;
 import fpl.domain.service.TransfersParsingService;
@@ -17,6 +18,7 @@ import fpl.output.ReportExportService;
 import fpl.repository.ApiEntryRepository;
 import fpl.repository.ApiLeagueRepository;
 import fpl.repository.ApiTransferRepository;
+import fpl.ui.console.PagesCountConsole;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.util.List;
@@ -28,9 +30,13 @@ public class FplReportGenerator {
     public static void main(String[] args) throws Exception {
         AnsiConsole.systemInstall();
 
-        int totalStandingsPages = ConsoleService.getEnteredPageCount();
-        ConsoleService.terminateProgramIfNeeded(totalStandingsPages);
-        FplLogger.writeProcessingLog(totalStandingsPages);
+        var pagesCountConsole = new PagesCountConsole();
+        int mode = pagesCountConsole.askPagesCount();
+
+        int pages = LeagueSelectionPolicy.resolvePages(mode);
+        int leagueId = LeagueSelectionPolicy.resolveLeagueId(mode);
+
+        FplLogger.writeProcessingLog(pages);
 
         logger.info("ℹ️ Starting to parse pages!!");
         long startTime = System.currentTimeMillis();
@@ -44,9 +50,11 @@ public class FplReportGenerator {
         TransferRepository transferRepository = new ApiTransferRepository(api);
 
         logger.info("ℹ️ Starting to fetch all team IDs...");
-        List<Integer> entryIds = StandingsParsingService.collectTeamIds(
-                leagueRepository,
-                totalStandingsPages
+
+        FetchTeamIdsUseCase fetchTeamIdsUseCase = new FetchTeamIdsUseCase(leagueRepository);
+        List<Integer> entryIds = fetchTeamIdsUseCase.execute(
+                leagueId,
+                pages
         );
 
         logger.info("✅ Successfully retrieved all team links (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");

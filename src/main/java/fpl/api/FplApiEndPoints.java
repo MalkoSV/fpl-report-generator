@@ -10,19 +10,7 @@ public class FplApiEndPoints {
     public static final String PICKS = "/entry/%d/event/%d/picks/";
     public static final String TRANSFERS = "/entry/%d/transfers/";
 
-    public static final int OVERALL_LEAGUE_ID = 314;
-    public static final int MALS_LEAGUE_ID = 1032011;
-    public static final int PROGNOZILLA_LEAGUE_ID = 1031449;
-
     public static URI getUri(String endPoint, Object... args) {
         return URI.create(FPL_API_BASE + endPoint.formatted(args));
-    }
-
-    public static int getLeagueId(int mode) {
-        return switch (mode) {
-            case 201 -> MALS_LEAGUE_ID;
-            case 202 -> PROGNOZILLA_LEAGUE_ID;
-            default -> OVERALL_LEAGUE_ID;
-        };
     }
 }

@@ -1,11 +1,10 @@
-package fpl.api;
+package fpl.ui.console;
 
-import java.util.Scanner;
+import java.util.logging.Logger;
 
-public class InputUtils {
-    public static final int MAX_PAGES = 200;
+public class PagesCountConsole {
 
-    private static final Scanner scanner = new Scanner(System.in);
+    private final Logger logger = Logger.getLogger(PagesCountConsole.class.getName());
 
     private static final String RESET = "\u001B[0m";
     private static final String YELLOW = "\u001B[33m";
@@ -32,27 +31,28 @@ public class InputUtils {
             """ + RESET + BOLD + YELLOW + """
             Enter the number of pages to parse (0 - exit):\s""" + RESET;
 
-    public static int getEnteredNumber(String description, int min, int max) {
-        int result;
-        while (true) {
-            System.out.print(description);
+    public int askPagesCount() throws InterruptedException {
+        int count = readPagesCount();
 
-            if (scanner.hasNextInt()) {
-                result = scanner.nextInt();
-                scanner.nextLine();
-                if (result >= min && result <= max) {
-                    System.out.println();
-                    break;
-                } else {
-                    System.out.printf("⚠️ Error: the number must be between %d and %d%n", min, max);
-                }
-            } else {
-                System.out.println("⚠️ Error: a number is required!");
-                scanner.nextLine();
-            }
-            System.out.println();
+        if (count == 0) {
+            terminate();
         }
-        return result;
+
+        System.out.printf("✅ Your choice - %d%n", count);
+        return count;
     }
 
+    private int readPagesCount() {
+        return ConsoleInput.readNumber(
+                DESCRIPTION_FOR_ENTER_PAGE_NUMBER,
+                0,
+                202
+        );
+    }
+
+    private void terminate() throws InterruptedException {
+        logger.info("❌ Your choice - program terminated. Good luck!");
+        Thread.sleep(1000);
+        System.exit(0);
+    }
 }

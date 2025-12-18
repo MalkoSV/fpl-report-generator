@@ -2,7 +2,6 @@ package fpl.domain.stats;
 
 import fpl.domain.model.SquadPlayer;
 import fpl.domain.model.Team;
-import fpl.domain.utils.PlayerUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,7 +24,7 @@ public class TeamStatsService {
                 teams.stream().mapToInt(Team::wildCard).sum(),
                 teams.stream().mapToInt(Team::benchBoost).sum(),
                 teams.stream().mapToInt(Team::freeHit).sum(),
-                PlayerUtils.mergePlayers(getFullPlayerList(teams))
+                PlayerGameweekStatsMerger.mergePlayers(getFullPlayerList(teams))
         );
     }
 

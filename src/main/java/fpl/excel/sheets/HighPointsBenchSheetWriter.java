@@ -17,6 +17,6 @@ public class HighPointsBenchSheetWriter
     );
 
     public HighPointsBenchSheetWriter(List<PlayerGameweekStats> players) {
-        super("Bench (>5 points)", players, COLUMNS);
+        super("Bench (>6 points)", players, COLUMNS);
     }
 }

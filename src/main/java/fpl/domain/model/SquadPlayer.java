@@ -8,18 +8,18 @@ public record SquadPlayer(
         boolean tripleCaptain,
         boolean viceCaptain,
         int points,
-        int chanceSafe
+        int availability
 ) {
-    public SquadPlayer(PlayerSeasonView view, Pick pick) {
+    public SquadPlayer(PlayerSeasonView playerSeasonView, Pick pick) {
         this(
-                view.fullName(),
-                view.position(),
+                playerSeasonView.fullName(),
+                playerSeasonView.position(),
                 pick.multiplier() > 0,
                 pick.multiplier() >= 2,
                 pick.multiplier() == 3,
                 pick.viceCaptain(),
-                view.lastEventPoints(),
-                view.availability()
+                playerSeasonView.lastEventPoints(),
+                playerSeasonView.availability()
         );
     }
 }

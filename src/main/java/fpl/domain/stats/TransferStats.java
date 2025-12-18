@@ -1,12 +1,11 @@
-package fpl.domain.utils;
+package fpl.domain.stats;
 
-import fpl.domain.stats.TeamStatsService;
 import fpl.domain.transfers.Transfer;
 
 import java.util.List;
 import java.util.Map;
 
-public class TransferUtils {
+public class TransferStats {
 
     public static Map<String, Long> calculateTransfersIn(List<Transfer> transfers) {
         return TeamStatsService.groupAndSort(transfers, Transfer::playerIn);

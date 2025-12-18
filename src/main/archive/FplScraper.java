@@ -2,7 +2,6 @@ package fpl.arch;
 
 import fpl.api.dto.BootstrapResponse;
 import fpl.api.dto.PlayerDto;
-import fpl.app.ConsoleService;
 import fpl.output.ReportExportService;
 import fpl.arch.scraper.TeamLinksScraper;
 import fpl.domain.model.Team;

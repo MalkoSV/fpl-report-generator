@@ -26,7 +26,7 @@ public record PlayerGameweekStats(
                 p.tripleCaptain() ? 1 : 0,
                 p.viceCaptain() ? 1 : 0,
                 p.points(),
-                p.chanceSafe()
+                p.availability()
         );
     }
 

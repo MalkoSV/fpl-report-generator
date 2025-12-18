@@ -1,24 +1,24 @@
 package fpl.domain.transfers;
 
-import fpl.domain.utils.TransferUtils;
-import fpl.domain.utils.TransfersFilter;
+import fpl.domain.stats.TransferStats;
+import fpl.domain.filters.TransfersFilter;
 
 import java.util.List;
 
 public class TransfersDataBuilder {
 
     public TransfersData build(List<Transfer> transfers) {
-        List<Transfer> withoutFreeHit = TransfersFilter.filterWithoutFreeHit(transfers);
-        List<Transfer> wildcard = TransfersFilter.filterWildcard(transfers);
-        List<Transfer> freeHit = TransfersFilter.filterFreeHit(transfers);
+        List<Transfer> withoutFreeHit = TransfersFilter.withoutFreeHits(transfers);
+        List<Transfer> wildcard = TransfersFilter.wildcards(transfers);
+        List<Transfer> freeHit = TransfersFilter.freeHits(transfers);
 
         return new TransfersData(
-                TransferUtils.calculateTransfersIn(withoutFreeHit),
-                TransferUtils.calculateTransfersOut(withoutFreeHit),
-                TransferUtils.calculateTransfersIn(wildcard),
-                TransferUtils.calculateTransfersOut(wildcard),
-                TransferUtils.calculateTransfersIn(freeHit),
-                TransferUtils.calculateTransfersOut(freeHit)
+                TransferStats.calculateTransfersIn(withoutFreeHit),
+                TransferStats.calculateTransfersOut(withoutFreeHit),
+                TransferStats.calculateTransfersIn(wildcard),
+                TransferStats.calculateTransfersOut(wildcard),
+                TransferStats.calculateTransfersIn(freeHit),
+                TransferStats.calculateTransfersOut(freeHit)
         );
     }
 }

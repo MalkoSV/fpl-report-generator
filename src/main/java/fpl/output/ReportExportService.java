@@ -16,10 +16,10 @@ import fpl.excel.sheets.BenchPlayersSheetWriter;
 import fpl.excel.sheets.StartPlayersSheetWriter;
 import fpl.excel.sheets.PlayerStatsSheetWriter;
 import fpl.excel.sheets.SummarySheetWriter;
-import fpl.domain.utils.PlayerFilter;
+import fpl.domain.filters.PlayerSeasonStatsFilter;
 import fpl.domain.model.Team;
 import fpl.domain.stats.TeamSummary;
-import fpl.domain.utils.PlayerUtils;
+import fpl.domain.filters.PlayerGameweekStatsFilter;
 import fpl.domain.stats.TeamStatsService;
 import fpl.excel.sheets.TransfersSheetWriter;
 
@@ -48,14 +48,14 @@ public class ReportExportService {
                 "FPL Report GW-%d (top %d)".formatted(event, teams.size()),
                 args,
                 new GameweekPlayersSheetWriter(summary.players()),
-                new CaptainPlayersSheetWriter(PlayerUtils.getPlayersWhoCaptain(summary.players())),
-                new StartPlayersSheetWriter(PlayerUtils.getOnlyStartPlayers(summary.players())),
-                new BenchPlayersSheetWriter(PlayerUtils.getOnlyBenchPlayers(summary.players())),
-                new DoubtfulPlayersSheetWriter(PlayerUtils.getDoubtfulPlayers(summary.players())),
-                new HighPointsBenchSheetWriter(PlayerUtils.getBenchPlayersWithHighPoints(summary.players())),
+                new CaptainPlayersSheetWriter(PlayerGameweekStatsFilter.captained(summary.players())),
+                new StartPlayersSheetWriter(PlayerGameweekStatsFilter.startersOnly(summary.players())),
+                new BenchPlayersSheetWriter(PlayerGameweekStatsFilter.benchOnly(summary.players())),
+                new DoubtfulPlayersSheetWriter(PlayerGameweekStatsFilter.doubtful(summary.players())),
+                new HighPointsBenchSheetWriter(PlayerGameweekStatsFilter.highPointsBench(summary.players())),
                 new SummarySheetWriter(summaryData),
                 new TransfersSheetWriter(transfersData),
-                new PlayerStatsSheetWriter(PlayerFilter.filter(playersData, 25, 2.75,0.1))
+                new PlayerStatsSheetWriter(PlayerSeasonStatsFilter.filterTopPlayers(playersData, 25, 2.75,0.1))
                 );
     }
 }
