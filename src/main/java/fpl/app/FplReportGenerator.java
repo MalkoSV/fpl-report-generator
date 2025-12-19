@@ -75,9 +75,7 @@ public class FplReportGenerator {
         );
 
         logger.info("ℹ️ Start to export result...");
-        List<PlayerSeasonView> playersData = bootstrapContext.players()
-                .all().stream()
-                .toList();
+        List<PlayerSeasonView> playersData = bootstrapContext.players().all();
 
         new ReportExportService().exportResults(
                 teams,
