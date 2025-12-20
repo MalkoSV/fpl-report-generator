@@ -2,6 +2,7 @@ package fpl.app;
 
 import fpl.api.FplApiClient;
 import fpl.api.FplApiFactory;
+import fpl.app.config.ExportConfiguration;
 import fpl.app.config.LeagueSelection;
 import fpl.app.config.LeagueSelectionPolicy;
 import fpl.context.BootstrapContext;
@@ -14,8 +15,10 @@ import fpl.domain.usecase.AssembleTeamsUseCase;
 import fpl.domain.transfers.Transfer;
 import fpl.domain.usecase.ParseTransfersUseCase;
 import fpl.domain.model.Team;
+import fpl.excel.core.ExcelWriter;
 import fpl.logging.ProcessingLogger;
 import fpl.output.ReportExportService;
+import fpl.output.builder.ReportDataBuilder;
 import fpl.repository.ApiEntryRepository;
 import fpl.repository.ApiLeagueRepository;
 import fpl.repository.ApiTransferRepository;
@@ -75,9 +78,14 @@ public class FplReportGenerator {
         );
 
         logger.info("ℹ️ Start to export result...");
+
         List<PlayerSeasonView> playersData = bootstrapContext.players().all();
 
-        new ReportExportService().exportResults(
+        ExcelWriter excelWriter = ExportConfiguration.excelWriter();
+        var reportDataBuilder = new ReportDataBuilder();
+        var exportService = new ReportExportService(reportDataBuilder, excelWriter);
+
+        exportService.exportResults(
                 teams,
                 playersData,
                 transfers,

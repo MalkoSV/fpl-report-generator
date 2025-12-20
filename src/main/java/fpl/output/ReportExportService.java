@@ -3,8 +3,6 @@ package fpl.output;
 import fpl.domain.model.PlayerSeasonView;
 import fpl.domain.transfers.Transfer;
 import fpl.excel.core.ExcelWriter;
-import fpl.excel.io.FileNameGenerator;
-import fpl.excel.io.WorkbookFactory;
 import fpl.excel.sheets.HighPointsBenchSheetWriter;
 import fpl.excel.sheets.CaptainPlayersSheetWriter;
 import fpl.excel.sheets.DoubtfulPlayersSheetWriter;
@@ -22,7 +20,13 @@ import java.util.List;
 
 public class ReportExportService {
 
-    private final ReportDataBuilder dataBuilder = new ReportDataBuilder();
+    private final ReportDataBuilder dataBuilder;
+    private final ExcelWriter writer;
+
+    public ReportExportService(ReportDataBuilder dataBuilder, ExcelWriter writer) {
+        this.dataBuilder = dataBuilder;
+        this.writer = writer;
+    }
 
     public void exportResults(
             List<Team> teams,
@@ -32,12 +36,6 @@ public class ReportExportService {
             String[] args) {
 
         ReportData reportData = dataBuilder.build(teams, playersData, transfers);
-
-        ExcelWriter writer = new ExcelWriter(
-                new WorkbookFactory(),
-                new OutputDirectoryResolver(),
-                new FileNameGenerator()
-        );
 
         writer.writeExcel(
                 "FPL Report GW-%d (top %d)".formatted(event, teams.size()),

@@ -21,6 +21,10 @@ public class ReportDataBuilder {
             List<PlayerSeasonView> players,
             List<Transfer> transfers
     ) {
+        int topPlayerMinPoints = 25;
+        double topPlayerMinPpm = 2.75;
+        double topPlayerMinXgi = 0.1;
+
         TeamSummary summary = TeamStats.calculateSummary(teams);
         SummaryData summaryData = SummaryData.from(teams, summary);
         TransfersData transfersData = new TransfersDataBuilder().build(transfers);
@@ -38,7 +42,12 @@ public class ReportDataBuilder {
                 PlayerGameweekStatsFilter.doubtful(gameweekPlayers),
                 PlayerGameweekStatsFilter.highPointsBench(gameweekPlayers),
 
-                PlayerSeasonStatsFilter.filterTopPlayers(players, 25, 2.75, 0.1)
+                PlayerSeasonStatsFilter.filterTopPlayers(
+                        players,
+                        topPlayerMinPoints,
+                        topPlayerMinPpm,
+                        topPlayerMinXgi
+                )
         );
     }
 }
