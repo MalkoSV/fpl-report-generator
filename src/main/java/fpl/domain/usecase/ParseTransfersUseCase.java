@@ -21,11 +21,15 @@ public class ParseTransfersUseCase {
 
     private static final Logger logger = Logger.getLogger(ParseTransfersUseCase.class.getName());
 
-    private ParseTransfersUseCase() {}
+    private final PlayerRepository playerRepository;
+    private final TransferRepository transferRepository;
 
-    public static List<Transfer> collectTransfers(
-            PlayerRepository players,
-            TransferRepository transferRepository,
+    public ParseTransfersUseCase(PlayerRepository playerRepository, TransferRepository transferRepository) {
+        this.playerRepository = playerRepository;
+        this.transferRepository = transferRepository;
+    }
+
+    public List<Transfer> execute(
             int eventId,
             List<Team> teams
     ) {
@@ -46,7 +50,7 @@ public class ParseTransfersUseCase {
                 .map(team -> CompletableFuture.supplyAsync(
                         () -> processTransfers(
                                 team.entryId(),
-                                players,
+                                playerRepository,
                                 teamsByEntry,
                                 transferRepository,
                                 eventId,

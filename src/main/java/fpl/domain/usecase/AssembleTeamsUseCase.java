@@ -25,11 +25,18 @@ public class AssembleTeamsUseCase {
 
     private static final Logger logger = Logger.getLogger(AssembleTeamsUseCase.class.getName());
 
-    private AssembleTeamsUseCase() {}
+    private final PlayerRepository playerRepository;
+    private final EntryRepository entryRepository;
 
-    public static List<Team> collectTeamStats(
-            PlayerRepository players,
-            EntryRepository entryRepository,
+    public AssembleTeamsUseCase(
+            PlayerRepository playerRepository,
+            EntryRepository entryRepository
+    ) {
+        this.playerRepository = playerRepository;
+        this.entryRepository = entryRepository;
+    }
+
+    public List<Team> execute(
             int eventId,
             List<Integer> entryIds) {
 
@@ -44,7 +51,7 @@ public class AssembleTeamsUseCase {
         for (int entryId : entryIds) {
             CompletableFuture<Team> currentTeam = CompletableFuture.supplyAsync(() -> {
                 try {
-                    return processTeam(players, entryRepository, entryId, eventId, progressBar);
+                    return processTeam(playerRepository, entryRepository, entryId, eventId, progressBar);
                 } catch (Exception e) {
                     logger.warning("⚠️ Error for entry " + entryId + ": " + e.getMessage());
                     return null;

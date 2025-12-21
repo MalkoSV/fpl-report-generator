@@ -9,6 +9,7 @@ import fpl.context.BootstrapContext;
 import fpl.domain.model.PlayerSeasonView;
 import fpl.domain.repository.EntryRepository;
 import fpl.domain.repository.LeagueRepository;
+import fpl.domain.repository.PlayerRepository;
 import fpl.domain.repository.TransferRepository;
 import fpl.domain.usecase.FetchTeamIdsUseCase;
 import fpl.domain.usecase.AssembleTeamsUseCase;
@@ -33,67 +34,66 @@ public class FplReportGenerator {
 
     public static void main(String[] args) throws Exception {
         AnsiConsole.systemInstall();
+        try {
+            var pagesCountConsole = new PagesCountConsole();
+            int input = pagesCountConsole.askPagesCount();
+            LeagueSelection selection = LeagueSelectionPolicy.resolve(input);
 
-        var pagesCountConsole = new PagesCountConsole();
-        int input = pagesCountConsole.askPagesCount();
+            ProcessingLogger.logStart(selection.description());
 
-        LeagueSelection selection = LeagueSelectionPolicy.resolve(input);
+            logger.info("ℹ️ Starting to parse Bootstrap page...");
+            long startTime = System.currentTimeMillis();
 
-        ProcessingLogger.logStart(selection.description());
+            FplApiClient api = FplApiFactory.createJackson();
 
-        logger.info("ℹ️ Starting to parse pages!!");
-        long startTime = System.currentTimeMillis();
+            var bootstrapContext = new BootstrapContext(api);
+            int eventId = bootstrapContext.events().lastId();
+            PlayerRepository playerRepository = bootstrapContext.players();
 
-        FplApiClient api = FplApiFactory.createJackson();
-        var bootstrapContext = new BootstrapContext(api);
-        int eventId = bootstrapContext.events().lastId();
+            EntryRepository entryRepository = new ApiEntryRepository(api);
+            LeagueRepository leagueRepository = new ApiLeagueRepository(api);
+            TransferRepository transferRepository = new ApiTransferRepository(api);
 
-        EntryRepository entryRepository = new ApiEntryRepository(api);
-        LeagueRepository leagueRepository = new ApiLeagueRepository(api);
-        TransferRepository transferRepository = new ApiTransferRepository(api);
+            logger.info("ℹ️ Starting to fetch all team IDs...");
 
-        logger.info("ℹ️ Starting to fetch all team IDs...");
+            FetchTeamIdsUseCase fetchTeamIdsUseCase = new FetchTeamIdsUseCase(leagueRepository);
+            List<Integer> entryIds = fetchTeamIdsUseCase.execute(
+                    selection.leagueId(),
+                    selection.pages()
+            );
 
-        FetchTeamIdsUseCase fetchTeamIdsUseCase = new FetchTeamIdsUseCase(leagueRepository);
-        List<Integer> entryIds = fetchTeamIdsUseCase.execute(
-                selection.leagueId(),
-                selection.pages()
-        );
+            logger.info("✅ Successfully retrieved all team links (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");
 
-        logger.info("✅ Successfully retrieved all team links (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");
+            logger.info("ℹ️ Collecting data from the pages...");
+            var assembleTeamsUseCase = new AssembleTeamsUseCase(playerRepository, entryRepository);
+            List<Team> teams = assembleTeamsUseCase.execute(
+                    eventId,
+                    entryIds
+            );
 
-        logger.info("ℹ️ Collecting data from the pages...");
-        List<Team> teams = AssembleTeamsUseCase.collectTeamStats(
-                bootstrapContext.players(),
-                entryRepository,
-                eventId,
-                entryIds
-        );
+            var parseTransfersUseCase = new ParseTransfersUseCase(playerRepository, transferRepository);
+            List<Transfer> transfers = parseTransfersUseCase.execute(
+                    eventId,
+                    teams
+            );
 
-        List<Transfer> transfers = ParseTransfersUseCase.collectTransfers(
-                bootstrapContext.players(),
-                transferRepository,
-                eventId,
-                teams
-        );
+            logger.info("ℹ️ Start to export result...");
 
-        logger.info("ℹ️ Start to export result...");
+            List<PlayerSeasonView> playersData = playerRepository.all();
 
-        List<PlayerSeasonView> playersData = bootstrapContext.players().all();
+            ExcelWriter excelWriter = ExportConfiguration.excelWriter();
+            var exportService = new ReportExportService(new ReportDataBuilder(), excelWriter);
 
-        ExcelWriter excelWriter = ExportConfiguration.excelWriter();
-        var reportDataBuilder = new ReportDataBuilder();
-        var exportService = new ReportExportService(reportDataBuilder, excelWriter);
-
-        exportService.exportResults(
-                teams,
-                playersData,
-                transfers,
-                eventId,
-                args
-        );
-
-        logger.info("⏱️ Completed in " + (System.currentTimeMillis() - startTime) / 1000 + "s");
-        AnsiConsole.systemUninstall();
+            exportService.exportResults(
+                    teams,
+                    playersData,
+                    transfers,
+                    eventId,
+                    args
+            );
+            ProcessingLogger.logEnd(startTime);
+        } finally {
+            AnsiConsole.systemUninstall();
+        }
     }
 }
