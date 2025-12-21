@@ -9,6 +9,6 @@ public final class ProcessingLogger {
     }
 
     public static void logEnd(long startTime) {
-        System.out.printf("⏱️ Completed in %d sec%n", (System.currentTimeMillis() - startTime) / 1000);
+        System.out.printf("⏱️ Completed in %d sec!%n", (System.currentTimeMillis() - startTime) / 1000);
     }
 }

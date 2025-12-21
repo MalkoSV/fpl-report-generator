@@ -44,6 +44,7 @@ public class AssembleTeamsUseCase {
 
         int threadCount = AppLimits.getThreadsNumber();
         logger.info("🚀 Starting to fetch picks using " + threadCount + " threads...");
+        long startTime = System.currentTimeMillis();
 
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
 
@@ -65,6 +66,8 @@ public class AssembleTeamsUseCase {
                 .toList();
 
         executor.shutdown();
+        logger.info("✅ Pick fetching completed (in %d sec)".formatted((System.currentTimeMillis() - startTime) / 1000));
+
         return teams;
     }
 

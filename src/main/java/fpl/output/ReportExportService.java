@@ -3,6 +3,7 @@ package fpl.output;
 import fpl.domain.model.PlayerSeasonView;
 import fpl.domain.transfers.Transfer;
 import fpl.excel.core.ExcelWriter;
+import fpl.excel.io.FileNameGenerator;
 import fpl.excel.sheets.HighPointsBenchSheetWriter;
 import fpl.excel.sheets.CaptainPlayersSheetWriter;
 import fpl.excel.sheets.DoubtfulPlayersSheetWriter;
@@ -16,30 +17,40 @@ import fpl.excel.sheets.TransfersSheetWriter;
 import fpl.output.builder.ReportDataBuilder;
 import fpl.output.model.ReportData;
 
+import java.io.File;
 import java.util.List;
 
 public class ReportExportService {
 
     private final ReportDataBuilder dataBuilder;
     private final ExcelWriter writer;
+    private final OutputDirectoryResolver directoryResolver;
+    private final FileNameGenerator fileNameGenerator;
 
-    public ReportExportService(ReportDataBuilder dataBuilder, ExcelWriter writer) {
+    public ReportExportService(
+            ReportDataBuilder dataBuilder,
+            ExcelWriter writer,
+            OutputDirectoryResolver directoryResolver,
+            FileNameGenerator fileNameGenerator
+    ) {
         this.dataBuilder = dataBuilder;
         this.writer = writer;
+        this.directoryResolver = directoryResolver;
+        this.fileNameGenerator = fileNameGenerator;
     }
 
-    public void exportResults(
+    public void exportReport(
             List<Team> teams,
             List<PlayerSeasonView> playersData,
             List<Transfer> transfers,
             int event,
             String[] args) {
 
+        File outputFile = resolveOutputFile(event, teams.size(), args);
         ReportData reportData = dataBuilder.build(teams, playersData, transfers);
 
-        writer.writeExcel(
-                "FPL Report GW-%d (top %d)".formatted(event, teams.size()),
-                args,
+        writer.export(
+                outputFile,
                 new GameweekPlayersSheetWriter(reportData.allPlayers()),
                 new CaptainPlayersSheetWriter(reportData.captains()),
                 new StartPlayersSheetWriter(reportData.starters()),
@@ -51,4 +62,17 @@ public class ReportExportService {
                 new PlayerStatsSheetWriter(reportData.topSeasonPlayers())
         );
     }
+
+    private File resolveOutputFile(
+            int event,
+            int teamsCount,
+            String[] args
+    ) {
+        File outputDir = directoryResolver.resolve(args);
+        String fileName = fileNameGenerator.generate(
+                "FPL Report GW-%d (top %d)".formatted(event, teamsCount)
+        );
+        return new File(outputDir, fileName);
+    }
+
 }

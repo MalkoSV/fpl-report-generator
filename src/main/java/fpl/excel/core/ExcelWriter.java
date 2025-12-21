@@ -1,10 +1,8 @@
 package fpl.excel.core;
 
 import fpl.excel.builder.GenericSheetWriter;
-import fpl.excel.io.FileNameGenerator;
 import fpl.excel.io.WorkbookFactory;
 import fpl.excel.style.ExcelStyleFactory;
-import fpl.output.OutputDirectoryResolver;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
@@ -17,26 +15,13 @@ public class ExcelWriter {
     private static final Logger logger = Logger.getLogger(ExcelWriter.class.getName());
 
     private final WorkbookFactory workbookFactory;
-    private final OutputDirectoryResolver directoryResolver;
-    private final FileNameGenerator fileNameGenerator;
 
-    public ExcelWriter(
-            WorkbookFactory workbookFactory,
-            OutputDirectoryResolver directoryResolver,
-            FileNameGenerator fileNameGenerator
-    ) {
+    public ExcelWriter(WorkbookFactory workbookFactory) {
         this.workbookFactory = workbookFactory;
-        this.directoryResolver = directoryResolver;
-        this.fileNameGenerator = fileNameGenerator;
     }
 
-    public void writeExcel(String baseFileName,
-                           String[] args,
-                           GenericSheetWriter<?>... sheetWriters) {
-
-        File outputDir = directoryResolver.resolve(args);
-        String finalFileName = fileNameGenerator.generate(baseFileName);
-        File outputFile = new File(outputDir, finalFileName);
+    public void export(File outputFile,
+                       GenericSheetWriter<?>... sheetWriters) {
 
         try (Workbook workbook = workbookFactory.createWorkbook()) {
 

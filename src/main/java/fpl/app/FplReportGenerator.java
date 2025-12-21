@@ -16,8 +16,9 @@ import fpl.domain.usecase.AssembleTeamsUseCase;
 import fpl.domain.transfers.Transfer;
 import fpl.domain.usecase.ParseTransfersUseCase;
 import fpl.domain.model.Team;
-import fpl.excel.core.ExcelWriter;
+import fpl.excel.io.FileNameGenerator;
 import fpl.logging.ProcessingLogger;
+import fpl.output.OutputDirectoryResolver;
 import fpl.output.ReportExportService;
 import fpl.output.builder.ReportDataBuilder;
 import fpl.repository.ApiEntryRepository;
@@ -81,10 +82,13 @@ public class FplReportGenerator {
 
             List<PlayerSeasonView> playersData = playerRepository.all();
 
-            ExcelWriter excelWriter = ExportConfiguration.excelWriter();
-            var exportService = new ReportExportService(new ReportDataBuilder(), excelWriter);
+            var exportService = new ReportExportService(
+                    new ReportDataBuilder(),
+                    ExportConfiguration.excelWriter(),
+                    new OutputDirectoryResolver(),
+                    new FileNameGenerator());
 
-            exportService.exportResults(
+            exportService.exportReport(
                     teams,
                     playersData,
                     transfers,
