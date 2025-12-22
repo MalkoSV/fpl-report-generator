@@ -1,6 +1,6 @@
 package fpl.excel.sheets;
 
-import fpl.excel.style.CellStyler;
+import fpl.excel.style.CellStyleApplier;
 import fpl.excel.style.ExcelStyleFactory;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,7 +24,7 @@ public class SummaryTableWriter {
             int col2,
             Object[][] rows
     ) {
-        CellStyler styler = new CellStyler(styles);
+        CellStyleApplier styler = new CellStyleApplier(styles);
         int currentRow = startRow;
 
         for (Object[] r : rows) {
@@ -32,12 +32,12 @@ public class SummaryTableWriter {
 
             Cell c1 = row.createCell(col1);
             setCellValue(c1, r[0]);
-            styler.applySummaryTitle(c1);
+            styler.summaryTitle(c1);
 
             Cell c2 = row.createCell(col2);
             setCellValue(c2, r[1]);
             c2.setCellStyle(styles.summaryValue());
-            styler.applySummaryValue(c2);
+            styler.summaryValue(c2);
 
             currentRow++;
         }
@@ -50,16 +50,16 @@ public class SummaryTableWriter {
             int col2, String title2,
             Map<?, ?> map
     ) {
-        CellStyler styler = new CellStyler(styles);
+        CellStyleApplier styler = new CellStyleApplier(styles);
         Row headerRow = getOrCreateRow(startRow);
 
         Cell h1 = headerRow.createCell(col1);
         h1.setCellValue(title1);
-        styler.applyHeader(h1);
+        styler.header(h1);
 
         Cell h2 = headerRow.createCell(col2);
         h2.setCellValue(title2);
-        styler.applyHeader(h2);
+        styler.header(h2);
 
         int currentRow = startRow + 1;
         for (var entry : map.entrySet()) {
@@ -68,10 +68,10 @@ public class SummaryTableWriter {
 
             Cell c1 = r.createCell(col1);
             setCellValue(c1, entry.getKey());
-            styler.applyCentered(c1);
+            styler.centered(c1);
 
             Cell c2 = r.createCell(col2);
-            styler.applyCentered(c2);
+            styler.centered(c2);
 
             currentRow++;
         }

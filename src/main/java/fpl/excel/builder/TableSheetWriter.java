@@ -1,7 +1,7 @@
 package fpl.excel.builder;
 
 import fpl.domain.model.HasPosition;
-import fpl.excel.style.CellStyler;
+import fpl.excel.style.CellStyleApplier;
 import fpl.excel.style.ExcelStyleFactory;
 import fpl.excel.utils.FormatUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -24,13 +24,13 @@ public class TableSheetWriter<T> extends GenericSheetWriter<List<T>> {
     public Sheet writeSheet(Workbook wb, ExcelStyleFactory styles) {
 
         Sheet sheet = wb.createSheet(sheetName);
-        CellStyler styler = new CellStyler(styles);
+        CellStyleApplier styler = new CellStyleApplier(styles);
 
         Row header = sheet.createRow(0);
         for (int i = 0; i < columns.size(); i++) {
             Cell cell = header.createCell(i);
             cell.setCellValue(columns.get(i).title());
-            styler.applyHeader(cell);
+            styler.header(cell);
         }
 
         int rowNum = 1;
@@ -50,7 +50,7 @@ public class TableSheetWriter<T> extends GenericSheetWriter<List<T>> {
                 }
 
                 if (item instanceof HasPosition hp && col == 0) {
-                    styler.applyPlayerColor(cell, hp);
+                    styler.playerColor(cell, hp);
                 }
             }
         }
