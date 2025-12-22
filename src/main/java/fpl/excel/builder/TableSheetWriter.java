@@ -1,11 +1,10 @@
 package fpl.excel.builder;
 
 import fpl.domain.model.HasPosition;
-import fpl.excel.style.ColorUtils;
+import fpl.excel.style.CellStyler;
 import fpl.excel.style.ExcelStyleFactory;
 import fpl.excel.utils.FormatUtils;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -25,14 +24,13 @@ public class TableSheetWriter<T> extends GenericSheetWriter<List<T>> {
     public Sheet writeSheet(Workbook wb, ExcelStyleFactory styles) {
 
         Sheet sheet = wb.createSheet(sheetName);
+        CellStyler styler = new CellStyler(styles);
 
         Row header = sheet.createRow(0);
-        CellStyle headerStyle = styles.header();
-
         for (int i = 0; i < columns.size(); i++) {
             Cell cell = header.createCell(i);
             cell.setCellValue(columns.get(i).title());
-            cell.setCellStyle(headerStyle);
+            styler.applyHeader(cell);
         }
 
         int rowNum = 1;
@@ -51,14 +49,9 @@ public class TableSheetWriter<T> extends GenericSheetWriter<List<T>> {
                     cell.setBlank();
                 }
 
-                if (col == 0) {
-                    try {
-                        cell.setCellStyle(styles.withColor(ColorUtils.getColorForCell((HasPosition) item)));
-                    } catch (Exception e) {
-                        //
-                    }
+                if (item instanceof HasPosition hp && col == 0) {
+                    styler.applyPlayerColor(cell, hp);
                 }
-
             }
         }
         sheet.autoSizeColumn(0);

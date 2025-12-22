@@ -21,6 +21,7 @@ import fpl.logging.ProcessingLogger;
 import fpl.output.OutputDirectoryResolver;
 import fpl.output.ReportExportService;
 import fpl.output.builder.ReportDataBuilder;
+import fpl.output.excel.SheetWriterFactory;
 import fpl.repository.ApiEntryRepository;
 import fpl.repository.ApiLeagueRepository;
 import fpl.repository.ApiTransferRepository;
@@ -85,6 +86,7 @@ public class FplReportGenerator {
             var exportService = new ReportExportService(
                     new ReportDataBuilder(),
                     ExportConfiguration.excelWriter(),
+                    new SheetWriterFactory(),
                     new OutputDirectoryResolver(),
                     new FileNameGenerator());
 

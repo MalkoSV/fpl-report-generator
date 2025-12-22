@@ -1,6 +1,5 @@
 package fpl.excel.core;
 
-import fpl.excel.builder.GenericSheetWriter;
 import fpl.excel.io.WorkbookFactory;
 import fpl.excel.style.ExcelStyleFactory;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -8,6 +7,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class ExcelWriter {
@@ -21,13 +21,13 @@ public class ExcelWriter {
     }
 
     public void export(File outputFile,
-                       GenericSheetWriter<?>... sheetWriters) {
+                       List<SheetWriter> sheetWriters) {
 
         try (Workbook workbook = workbookFactory.createWorkbook()) {
 
             ExcelStyleFactory styleFactory = new ExcelStyleFactory(workbook);
 
-            for (GenericSheetWriter<?> writer : sheetWriters) {
+            for (var writer : sheetWriters) {
                 writer.writeSheet(workbook, styleFactory);
             }
 

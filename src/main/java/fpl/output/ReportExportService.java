@@ -4,17 +4,9 @@ import fpl.domain.model.PlayerSeasonView;
 import fpl.domain.transfers.Transfer;
 import fpl.excel.core.ExcelWriter;
 import fpl.excel.io.FileNameGenerator;
-import fpl.excel.sheets.HighPointsBenchSheetWriter;
-import fpl.excel.sheets.CaptainPlayersSheetWriter;
-import fpl.excel.sheets.DoubtfulPlayersSheetWriter;
-import fpl.excel.sheets.GameweekPlayersSheetWriter;
-import fpl.excel.sheets.BenchPlayersSheetWriter;
-import fpl.excel.sheets.StartPlayersSheetWriter;
-import fpl.excel.sheets.PlayerStatsSheetWriter;
-import fpl.excel.sheets.SummarySheetWriter;
 import fpl.domain.model.Team;
-import fpl.excel.sheets.TransfersSheetWriter;
 import fpl.output.builder.ReportDataBuilder;
+import fpl.output.excel.SheetWriterFactory;
 import fpl.output.model.ReportData;
 
 import java.io.File;
@@ -24,17 +16,20 @@ public class ReportExportService {
 
     private final ReportDataBuilder dataBuilder;
     private final ExcelWriter writer;
+    private final SheetWriterFactory sheetWriterFactory;
     private final OutputDirectoryResolver directoryResolver;
     private final FileNameGenerator fileNameGenerator;
 
     public ReportExportService(
             ReportDataBuilder dataBuilder,
             ExcelWriter writer,
+            SheetWriterFactory sheetWriterFactory,
             OutputDirectoryResolver directoryResolver,
             FileNameGenerator fileNameGenerator
     ) {
         this.dataBuilder = dataBuilder;
         this.writer = writer;
+        this.sheetWriterFactory = sheetWriterFactory;
         this.directoryResolver = directoryResolver;
         this.fileNameGenerator = fileNameGenerator;
     }
@@ -51,15 +46,7 @@ public class ReportExportService {
 
         writer.export(
                 outputFile,
-                new GameweekPlayersSheetWriter(reportData.allPlayers()),
-                new CaptainPlayersSheetWriter(reportData.captains()),
-                new StartPlayersSheetWriter(reportData.starters()),
-                new BenchPlayersSheetWriter(reportData.bench()),
-                new DoubtfulPlayersSheetWriter(reportData.doubtful()),
-                new HighPointsBenchSheetWriter(reportData.highPointsBench()),
-                new SummarySheetWriter(reportData.summaryData()),
-                new TransfersSheetWriter(reportData.transfersData()),
-                new PlayerStatsSheetWriter(reportData.topSeasonPlayers())
+                sheetWriterFactory.create(reportData)
         );
     }
 
@@ -69,9 +56,8 @@ public class ReportExportService {
             String[] args
     ) {
         File outputDir = directoryResolver.resolve(args);
-        String fileName = fileNameGenerator.generate(
-                "FPL Report GW-%d (top %d)".formatted(event, teamsCount)
-        );
+        String fileName = fileNameGenerator.generate("FPL Report GW-%d (top %d)".formatted(event, teamsCount));
+
         return new File(outputDir, fileName);
     }
 

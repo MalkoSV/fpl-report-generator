@@ -1,7 +1,10 @@
 package fpl.excel.sheets;
 
+import fpl.excel.style.CellStyler;
 import fpl.excel.style.ExcelStyleFactory;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Map;
 
@@ -19,8 +22,9 @@ public class SummaryTableWriter {
             int startRow,
             int col1,
             int col2,
-            Object[][] rows) {
-
+            Object[][] rows
+    ) {
+        CellStyler styler = new CellStyler(styles);
         int currentRow = startRow;
 
         for (Object[] r : rows) {
@@ -28,11 +32,12 @@ public class SummaryTableWriter {
 
             Cell c1 = row.createCell(col1);
             setCellValue(c1, r[0]);
-            c1.setCellStyle(styles.summaryTitle());
+            styler.applySummaryTitle(c1);
 
             Cell c2 = row.createCell(col2);
             setCellValue(c2, r[1]);
             c2.setCellStyle(styles.summaryValue());
+            styler.applySummaryValue(c2);
 
             currentRow++;
         }
@@ -45,15 +50,16 @@ public class SummaryTableWriter {
             int col2, String title2,
             Map<?, ?> map
     ) {
+        CellStyler styler = new CellStyler(styles);
         Row headerRow = getOrCreateRow(startRow);
 
         Cell h1 = headerRow.createCell(col1);
         h1.setCellValue(title1);
-        h1.setCellStyle(styles.header());
+        styler.applyHeader(h1);
 
         Cell h2 = headerRow.createCell(col2);
         h2.setCellValue(title2);
-        h2.setCellStyle(styles.header());
+        styler.applyHeader(h2);
 
         int currentRow = startRow + 1;
         for (var entry : map.entrySet()) {
@@ -62,11 +68,10 @@ public class SummaryTableWriter {
 
             Cell c1 = r.createCell(col1);
             setCellValue(c1, entry.getKey());
-            c1.setCellStyle(styles.centered());
+            styler.applyCentered(c1);
 
             Cell c2 = r.createCell(col2);
-            setCellValue(c2, entry.getValue());
-            c2.setCellStyle(styles.centered());
+            styler.applyCentered(c2);
 
             currentRow++;
         }

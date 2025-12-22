@@ -1,10 +1,11 @@
 package fpl.excel.builder;
 
+import fpl.excel.core.SheetWriter;
 import fpl.excel.style.ExcelStyleFactory;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-public abstract class GenericSheetWriter<T> {
+public abstract class GenericSheetWriter<T> implements SheetWriter {
 
     protected final String sheetName;
     protected final T data;

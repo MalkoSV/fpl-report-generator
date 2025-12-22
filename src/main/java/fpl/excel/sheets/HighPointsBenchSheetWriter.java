@@ -6,8 +6,7 @@ import fpl.excel.builder.TableSheetWriter;
 
 import java.util.List;
 
-public class HighPointsBenchSheetWriter
-        extends TableSheetWriter<PlayerGameweekSummary> {
+public class HighPointsBenchSheetWriter extends TableSheetWriter<PlayerGameweekSummary> {
 
     private static final List<Col<PlayerGameweekSummary>> COLUMNS = List.of(
             new Col<>("Name", PlayerGameweekSummary::name),
