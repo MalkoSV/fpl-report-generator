@@ -10,6 +10,7 @@ import fpl.domain.stats.TeamSummary;
 import fpl.domain.transfers.Transfer;
 import fpl.domain.transfers.TransfersData;
 import fpl.domain.transfers.TransfersDataBuilder;
+import fpl.output.config.ReportDefaults;
 import fpl.output.model.ReportData;
 
 import java.util.List;
@@ -21,10 +22,6 @@ public class ReportDataBuilder {
             List<PlayerSeasonView> players,
             List<Transfer> transfers
     ) {
-        int topPlayerMinPoints = 25;
-        double topPlayerMinPpm = 2.75;
-        double topPlayerMinXgi = 0.1;
-
         TeamSummary summary = TeamStats.calculateSummary(teams);
         SummaryData summaryData = SummaryData.from(teams, summary);
         TransfersData transfersData = new TransfersDataBuilder().build(transfers);
@@ -44,9 +41,9 @@ public class ReportDataBuilder {
 
                 PlayerSeasonStatsFilter.filterTopPlayers(
                         players,
-                        topPlayerMinPoints,
-                        topPlayerMinPpm,
-                        topPlayerMinXgi
+                        ReportDefaults.TOP_PLAYER_MIN_POINTS,
+                        ReportDefaults.TOP_PLAYER_MIN_PPM,
+                        ReportDefaults.TOP_PLAYER_MIN_XGI
                 )
         );
     }
