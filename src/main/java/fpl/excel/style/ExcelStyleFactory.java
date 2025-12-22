@@ -10,21 +10,31 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Centralized factory for all Excel cell styles.
- * Styles are cached per workbook to avoid duplication.
- */
 public class ExcelStyleFactory {
 
     private final Workbook workbook;
-    private final Map<String, CellStyle> cache = new HashMap<>();
+    private final Map<StyleKey, CellStyle> cache = new HashMap<>();
+
+    private sealed interface StyleKey
+            permits FixedStyle, ColorStyle {
+    }
+
+    private enum FixedStyle implements StyleKey {
+        HEADER,
+        CENTERED,
+        SUMMARY_TITLE,
+        SUMMARY_VALUE
+    }
+
+    private record ColorStyle(Color color) implements StyleKey {
+    }
 
     public ExcelStyleFactory(Workbook workbook) {
         this.workbook = workbook;
     }
 
     public CellStyle header() {
-        return cache.computeIfAbsent("HEADER", ignored -> {
+        return cache.computeIfAbsent(FixedStyle.HEADER, ignored -> {
             CellStyle style = workbook.createCellStyle();
             Font font = workbook.createFont();
             font.setBold(true);
@@ -37,7 +47,7 @@ public class ExcelStyleFactory {
     }
 
     public CellStyle centered() {
-        return cache.computeIfAbsent("CENTERED", ignored -> {
+        return cache.computeIfAbsent(FixedStyle.CENTERED, ignored -> {
             CellStyle style = workbook.createCellStyle();
             style.setAlignment(HorizontalAlignment.CENTER);
             return style;
@@ -45,7 +55,7 @@ public class ExcelStyleFactory {
     }
 
     public CellStyle summaryTitle() {
-        return cache.computeIfAbsent("SUMMARY_TITLE", ignored -> {
+        return cache.computeIfAbsent(FixedStyle.SUMMARY_TITLE, ignored -> {
             CellStyle style = workbook.createCellStyle();
             Font font = workbook.createFont();
             font.setBold(true);
@@ -58,7 +68,7 @@ public class ExcelStyleFactory {
     }
 
     public CellStyle summaryValue() {
-        return cache.computeIfAbsent("SUMMARY_VALUE", ignored -> {
+        return cache.computeIfAbsent(FixedStyle.SUMMARY_VALUE, ignored -> {
             CellStyle style = workbook.createCellStyle();
             style.setAlignment(HorizontalAlignment.RIGHT);
             return style;
@@ -66,7 +76,7 @@ public class ExcelStyleFactory {
     }
 
     public CellStyle withColor(Color color) {
-        return cache.computeIfAbsent(color.name(), ignored -> {
+        return cache.computeIfAbsent(new ColorStyle(color), ignored -> {
             CellStyle style = workbook.createCellStyle();
             style.setFillForegroundColor(color.getColorIndex());
             style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
