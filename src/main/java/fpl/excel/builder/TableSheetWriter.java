@@ -22,17 +22,26 @@ public class TableSheetWriter<T> extends GenericSheetWriter<List<T>> {
 
     @Override
     public Sheet writeSheet(Workbook wb, ExcelStyleFactory styles) {
-
         Sheet sheet = wb.createSheet(sheetName);
         CellStyleApplier styler = new CellStyleApplier(styles);
 
+        createHeader(sheet, styler);
+        createRows(sheet, styler);
+        autoSizeColumns(sheet);
+
+        return sheet;
+    }
+
+    private void createHeader(Sheet sheet, CellStyleApplier styler) {
         Row header = sheet.createRow(0);
         for (int i = 0; i < columns.size(); i++) {
             Cell cell = header.createCell(i);
             cell.setCellValue(columns.get(i).title());
             styler.header(cell);
         }
+    }
 
+    private void createRows(Sheet sheet, CellStyleApplier styler) {
         int rowNum = 1;
         for (T item : data) {
             Row row = sheet.createRow(rowNum++);
@@ -54,13 +63,14 @@ public class TableSheetWriter<T> extends GenericSheetWriter<List<T>> {
                 }
             }
         }
+    }
+
+    private void autoSizeColumns(Sheet sheet) {
         sheet.autoSizeColumn(0);
 
         int width = FormatUtils.calculateColumnWidth(columns);
         for (int i = 1; i < columns.size(); i++) {
             sheet.setColumnWidth(i, width);
         }
-
-        return sheet;
     }
 }
