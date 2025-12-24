@@ -7,10 +7,6 @@ import fpl.app.config.LeagueSelectionPolicy;
 import fpl.context.BootstrapContext;
 import fpl.domain.model.PlayerSeasonView;
 import fpl.domain.model.Team;
-import fpl.domain.repository.EntryRepository;
-import fpl.domain.repository.LeagueRepository;
-import fpl.domain.repository.PlayerRepository;
-import fpl.domain.repository.TransferRepository;
 import fpl.domain.transfers.Transfer;
 import fpl.domain.usecase.AssembleTeamsUseCase;
 import fpl.domain.usecase.FetchTeamIdsUseCase;
@@ -20,9 +16,7 @@ import fpl.output.OutputContext;
 import fpl.output.OutputDirectoryResolver;
 import fpl.output.ReportExportFactory;
 import fpl.output.config.ReportDefaults;
-import fpl.repository.ApiEntryRepository;
-import fpl.repository.ApiLeagueRepository;
-import fpl.repository.ApiTransferRepository;
+import fpl.repository.RepositoryFactory;
 import fpl.ui.console.OutputArgumentParser;
 import fpl.ui.console.PagesCountConsole;
 import org.fusesource.jansi.AnsiConsole;
@@ -37,50 +31,42 @@ public class ReportApplication {
     public void run(String[] args) throws Exception{
         AnsiConsole.systemInstall();
         try {
-            var pagesCountConsole = new PagesCountConsole();
-            int input = pagesCountConsole.askPagesCount();
-            LeagueSelection selection = LeagueSelectionPolicy.resolve(input);
-
+            LeagueSelection selection = resolveSelection();
             ProcessingLogger.logStart(selection.description());
 
             logger.info("ℹ️ Starting to parse Bootstrap page...");
             long startTime = System.currentTimeMillis();
 
             FplApiClient api = FplApiFactory.createJackson();
-
             var bootstrapContext = new BootstrapContext(api);
-            int eventId = bootstrapContext.events().lastId();
-            PlayerRepository playerRepository = bootstrapContext.players();
 
-            EntryRepository entryRepository = new ApiEntryRepository(api);
-            LeagueRepository leagueRepository = new ApiLeagueRepository(api);
-            TransferRepository transferRepository = new ApiTransferRepository(api);
+            int eventId = bootstrapContext.events().lastId();
+            var repositories = RepositoryFactory.create(api, bootstrapContext);
 
             logger.info("ℹ️ Starting to fetch all team IDs...");
 
-            FetchTeamIdsUseCase fetchTeamIdsUseCase = new FetchTeamIdsUseCase(leagueRepository);
+            FetchTeamIdsUseCase fetchTeamIdsUseCase = new FetchTeamIdsUseCase(repositories.league());
             List<Integer> entryIds = fetchTeamIdsUseCase.execute(
                     selection.leagueId(),
                     selection.pages()
             );
-
             logger.info("✅ Successfully retrieved all team links (in " + (System.currentTimeMillis() - startTime) / 1000 + " sec).");
 
             logger.info("ℹ️ Collecting data from the pages...");
-            var assembleTeamsUseCase = new AssembleTeamsUseCase(playerRepository, entryRepository);
+            var assembleTeamsUseCase = new AssembleTeamsUseCase(repositories.players(), repositories.entry());
             List<Team> teams = assembleTeamsUseCase.execute(
                     eventId,
                     entryIds
             );
 
-            var parseTransfersUseCase = new ParseTransfersUseCase(playerRepository, transferRepository);
+            var parseTransfersUseCase = new ParseTransfersUseCase(repositories.players(), repositories.transfers());
             List<Transfer> transfers = parseTransfersUseCase.execute(
                     eventId,
                     teams
             );
 
             logger.info("ℹ️ Start to export result...");
-            List<PlayerSeasonView> playersData = playerRepository.all();
+            List<PlayerSeasonView> playersData = repositories.players().all();
 
             var outputDirectoryResolver = new OutputDirectoryResolver();
             File baseDir = new OutputArgumentParser().parse(args)
@@ -102,4 +88,12 @@ public class ReportApplication {
             AnsiConsole.systemUninstall();
         }
     }
+
+
+    private LeagueSelection resolveSelection() throws InterruptedException {
+        int input = new PagesCountConsole().askPagesCount();
+
+        return LeagueSelectionPolicy.resolve(input);
+    }
+
 }
