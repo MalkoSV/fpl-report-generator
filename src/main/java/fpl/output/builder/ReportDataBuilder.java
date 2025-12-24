@@ -3,6 +3,7 @@ package fpl.output.builder;
 import fpl.domain.filters.PlayerGameweekStatsFilter;
 import fpl.domain.model.PlayerSeasonView;
 import fpl.domain.model.Team;
+import fpl.domain.stats.PlayerGameweekSummary;
 import fpl.domain.stats.SummaryData;
 import fpl.domain.stats.TeamStats;
 import fpl.domain.stats.TeamSummary;
@@ -28,25 +29,33 @@ public class ReportDataBuilder {
 
     public ReportData build(
             List<Team> teams,
-            List<PlayerSeasonView> players,
+            List<PlayerSeasonView> seasonPlayers,
             List<Transfer> transfers
     ) {
-        TeamSummary summary = TeamStats.calculateSummary(teams);
-        SummaryData summaryData = SummaryData.from(teams, summary);
+        TeamSummary lastGameweekSummary = TeamStats.calculateSummary(teams);
+        SummaryData summaryData = SummaryData.from(teams, lastGameweekSummary);
         TransfersData transfersData = transfersBuilder.build(transfers);
 
-        var gameweekPlayers = summary.players();
+        List<PlayerGameweekSummary> gameweekPlayers = lastGameweekSummary.players();
+
+        List<PlayerGameweekSummary> captains = PlayerGameweekStatsFilter.captained(gameweekPlayers);
+        List<PlayerGameweekSummary> starters = PlayerGameweekStatsFilter.startersOnly(gameweekPlayers);
+        List<PlayerGameweekSummary> bench = PlayerGameweekStatsFilter.benchOnly(gameweekPlayers);
+        List<PlayerGameweekSummary> doubtful = PlayerGameweekStatsFilter.doubtful(gameweekPlayers);
+        List<PlayerGameweekSummary> highPointsBench = PlayerGameweekStatsFilter.highPointsBench(gameweekPlayers);
+
+        List<PlayerSeasonView> topSeasonPlayers = topPlayersSelectionPolicy.select(seasonPlayers);
 
         return new ReportData(
                 summaryData,
                 transfersData,
-
                 gameweekPlayers,
-                PlayerGameweekStatsFilter.captained(gameweekPlayers),
-                PlayerGameweekStatsFilter.startersOnly(gameweekPlayers),
-                PlayerGameweekStatsFilter.benchOnly(gameweekPlayers),
-                PlayerGameweekStatsFilter.doubtful(gameweekPlayers),
-                PlayerGameweekStatsFilter.highPointsBench(gameweekPlayers),
-                topPlayersSelectionPolicy.select(players));
+                captains,
+                starters,
+                bench,
+                doubtful,
+                highPointsBench,
+                topSeasonPlayers
+        );
     }
 }

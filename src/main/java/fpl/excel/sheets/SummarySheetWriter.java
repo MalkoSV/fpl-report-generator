@@ -21,9 +21,6 @@ public class SummarySheetWriter extends GenericSheetWriter<SummaryData> {
 
         int baseCol = 0;
 
-        // -----------------------------
-        // 1) Base summary table
-        // -----------------------------
         Object[][] baseInfo = {
                 {"Teams",          data.teamCount()},
                 {"Players",        data.playerCount()},
@@ -44,9 +41,6 @@ public class SummarySheetWriter extends GenericSheetWriter<SummaryData> {
 
         writer.writeSimpleTable(0, baseCol, baseCol + 1, baseInfo);
 
-        // -----------------------------
-        // 2) Zero-point players
-        // -----------------------------
         writer.writeMapTable(
                 0,
                 baseCol + 3, "0 pts players",
@@ -54,9 +48,6 @@ public class SummarySheetWriter extends GenericSheetWriter<SummaryData> {
                 data.zeroPointPlayers()
         );
 
-        // -----------------------------
-        // 3) Transfers count
-        // -----------------------------
         writer.writeMapTable(
                 0,
                 baseCol + 6, "Transfers",
@@ -64,9 +55,6 @@ public class SummarySheetWriter extends GenericSheetWriter<SummaryData> {
                 data.transfersCount()
         );
 
-        // -----------------------------
-        // 4) Transfers Cost (-4 / -8 etc)
-        // -----------------------------
         writer.writeMapTable(
                 data.transfersCount().size() + 2,
                 baseCol + 6, "Transfers Cost",
@@ -74,9 +62,6 @@ public class SummarySheetWriter extends GenericSheetWriter<SummaryData> {
                 data.transfersCost()
         );
 
-        // -----------------------------
-        // 5) Formations
-        // -----------------------------
         writer.writeMapTable(
                 0,
                 baseCol + 9, "Formation",
@@ -84,7 +69,6 @@ public class SummarySheetWriter extends GenericSheetWriter<SummaryData> {
                 data.formations()
         );
 
-        // auto-size
         for (int c = 0; c < 12; c++) sheet.autoSizeColumn(c);
 
         return sheet;

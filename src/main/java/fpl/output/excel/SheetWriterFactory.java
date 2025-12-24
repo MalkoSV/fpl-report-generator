@@ -24,8 +24,10 @@ public class SheetWriterFactory {
                 new BenchPlayersSheetWriter(data.bench()),
                 new DoubtfulPlayersSheetWriter(data.doubtful()),
                 new HighPointsBenchSheetWriter(data.highPointsBench()),
+
                 new SummarySheetWriter(data.summaryData()),
                 new TransfersSheetWriter(data.transfersData()),
+
                 new PlayerStatsSheetWriter(data.topSeasonPlayers())
         );
     }
