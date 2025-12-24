@@ -38,7 +38,7 @@ public class ExcelWriter {
             logger.info("Excel file saved: " + outputFile.getAbsolutePath());
 
         } catch (IOException e) {
-            logger.severe("Failed to write Excel file: " + e.getMessage());
+            throw new ExcelExportException("Failed to write Excel file: " + outputFile.getAbsolutePath(), e);
         }
     }
 }

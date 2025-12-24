@@ -1,0 +1,19 @@
+package fpl.output.builder;
+
+import fpl.domain.filters.PlayerSeasonStatsFilter;
+import fpl.domain.model.PlayerSeasonView;
+import fpl.output.config.ReportDefaults;
+
+import java.util.List;
+
+public class DefaultTopPlayersSelectionPolicy implements TopPlayersSelectionPolicy {
+    @Override
+    public List<PlayerSeasonView> select(List<PlayerSeasonView> players) {
+        return PlayerSeasonStatsFilter.filterTopPlayers(
+                players,
+                ReportDefaults.TOP_PLAYER_MIN_POINTS,
+                ReportDefaults.TOP_PLAYER_MIN_PPM,
+                ReportDefaults.TOP_PLAYER_MIN_XGI
+        );
+    }
+}

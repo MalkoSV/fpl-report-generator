@@ -17,20 +17,17 @@ public class ReportExportService {
     private final ReportDataBuilder dataBuilder;
     private final ExcelWriter writer;
     private final SheetWriterFactory sheetWriterFactory;
-    private final OutputDirectoryResolver directoryResolver;
     private final FileNameGenerator fileNameGenerator;
 
     public ReportExportService(
             ReportDataBuilder dataBuilder,
             ExcelWriter writer,
             SheetWriterFactory sheetWriterFactory,
-            OutputDirectoryResolver directoryResolver,
             FileNameGenerator fileNameGenerator
     ) {
         this.dataBuilder = dataBuilder;
         this.writer = writer;
         this.sheetWriterFactory = sheetWriterFactory;
-        this.directoryResolver = directoryResolver;
         this.fileNameGenerator = fileNameGenerator;
     }
 
@@ -39,10 +36,19 @@ public class ReportExportService {
             List<PlayerSeasonView> playersData,
             List<Transfer> transfers,
             int event,
-            String[] args) {
+            OutputContext outputContext
+    ) {
+        File outputFile = resolveOutputFile(
+                event,
+                teams.size(),
+                outputContext.outputDirectory()
+        );
 
-        File outputFile = resolveOutputFile(event, teams.size(), args);
-        ReportData reportData = dataBuilder.build(teams, playersData, transfers);
+        ReportData reportData = dataBuilder.build(
+                teams,
+                playersData,
+                transfers
+        );
 
         writer.export(
                 outputFile,
@@ -53,9 +59,8 @@ public class ReportExportService {
     private File resolveOutputFile(
             int event,
             int teamsCount,
-            String[] args
+            File outputDir
     ) {
-        File outputDir = directoryResolver.resolve(args);
         String fileName = fileNameGenerator.generate("FPL Report GW-%d (top %d)".formatted(event, teamsCount));
 
         return new File(outputDir, fileName);

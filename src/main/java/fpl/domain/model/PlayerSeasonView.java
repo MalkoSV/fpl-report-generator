@@ -42,4 +42,20 @@ public record PlayerSeasonView(
     public PositionType getPosition() {
         return position;
     }
+
+    public int goalsPlusAssists() {
+        return goalsScored() + assists();
+    }
+
+    public double realityAndXgiDelta() {
+        return goalsPlusAssists() - xGI();
+    }
+
+    public double eventPointsAndFormDelta() {
+        return lastEventPoints() - form();
+    }
+
+    public double cost() {
+        return nowCost()  / 10.0;
+    }
 }

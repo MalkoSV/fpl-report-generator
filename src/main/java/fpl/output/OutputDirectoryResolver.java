@@ -1,24 +1,15 @@
 package fpl.output;
 
 import java.io.File;
-import java.util.Arrays;
 
 public class OutputDirectoryResolver {
 
-    public File resolve(String[] args) {
-        String outputDir = Arrays.stream(args)
-                .filter(arg -> arg.startsWith("/output=") || arg.startsWith("--output="))
-                .findFirst()
-                .map(arg -> arg.substring(arg.indexOf('=') + 1).trim())
-                .orElse(System.getProperty("user.home")
-                        + File.separator + "Documents"
-                        + File.separator + "FPL-reports");
-
-        File outDir = new File(outputDir);
-        if (!outDir.exists() && !outDir.mkdirs()) {
-            throw new RuntimeException("Cannot create output directory: " + outDir.getAbsolutePath());
+    public File resolve(File baseDir) {
+        if (!baseDir.exists() && !baseDir.mkdirs()) {
+            throw new RuntimeException(
+                    "Cannot create output directory: " + baseDir.getAbsolutePath()
+            );
         }
-
-        return outDir;
+        return baseDir;
     }
 }

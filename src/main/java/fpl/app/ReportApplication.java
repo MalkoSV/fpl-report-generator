@@ -13,21 +13,27 @@ import fpl.domain.repository.LeagueRepository;
 import fpl.domain.repository.PlayerRepository;
 import fpl.domain.repository.TransferRepository;
 import fpl.domain.transfers.Transfer;
+import fpl.domain.transfers.TransfersDataBuilder;
 import fpl.domain.usecase.AssembleTeamsUseCase;
 import fpl.domain.usecase.FetchTeamIdsUseCase;
 import fpl.domain.usecase.ParseTransfersUseCase;
 import fpl.excel.io.FileNameGenerator;
 import fpl.logging.ProcessingLogger;
+import fpl.output.OutputContext;
 import fpl.output.OutputDirectoryResolver;
 import fpl.output.ReportExportService;
+import fpl.output.builder.DefaultTopPlayersSelectionPolicy;
 import fpl.output.builder.ReportDataBuilder;
+import fpl.output.config.ReportDefaults;
 import fpl.output.excel.SheetWriterFactory;
 import fpl.repository.ApiEntryRepository;
 import fpl.repository.ApiLeagueRepository;
 import fpl.repository.ApiTransferRepository;
+import fpl.ui.console.OutputArgumentParser;
 import fpl.ui.console.PagesCountConsole;
 import org.fusesource.jansi.AnsiConsole;
 
+import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -80,22 +86,32 @@ public class ReportApplication {
             );
 
             logger.info("ℹ️ Start to export result...");
-
             List<PlayerSeasonView> playersData = playerRepository.all();
 
+            var transfersBuilder = new TransfersDataBuilder();
+            var topPlayerPolicy = new DefaultTopPlayersSelectionPolicy();
+            var outputDirectoryResolver = new OutputDirectoryResolver();
             var exportService = new ReportExportService(
-                    new ReportDataBuilder(),
+                    new ReportDataBuilder(
+                            transfersBuilder,
+                            topPlayerPolicy
+                    ),
                     ExportConfiguration.excelWriter(),
                     new SheetWriterFactory(),
-                    new OutputDirectoryResolver(),
                     new FileNameGenerator());
+
+            File baseDir = new OutputArgumentParser().parse(args)
+                    .orElse(ReportDefaults.DEFAULT_BASE_DIR);
+
+            File outputDir = outputDirectoryResolver.resolve(baseDir);
+            var outputContext = new OutputContext(outputDir);
 
             exportService.exportReport(
                     teams,
                     playersData,
                     transfers,
                     eventId,
-                    args
+                    outputContext
             );
             ProcessingLogger.logEnd(startTime);
         } finally {

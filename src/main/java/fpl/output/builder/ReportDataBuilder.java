@@ -1,7 +1,6 @@
 package fpl.output.builder;
 
 import fpl.domain.filters.PlayerGameweekStatsFilter;
-import fpl.domain.filters.PlayerSeasonStatsFilter;
 import fpl.domain.model.PlayerSeasonView;
 import fpl.domain.model.Team;
 import fpl.domain.stats.SummaryData;
@@ -10,12 +9,22 @@ import fpl.domain.stats.TeamSummary;
 import fpl.domain.transfers.Transfer;
 import fpl.domain.transfers.TransfersData;
 import fpl.domain.transfers.TransfersDataBuilder;
-import fpl.output.config.ReportDefaults;
 import fpl.output.model.ReportData;
 
 import java.util.List;
 
 public class ReportDataBuilder {
+
+    private final TransfersDataBuilder transfersBuilder;
+    private final TopPlayersSelectionPolicy topPlayersSelectionPolicy;
+
+    public ReportDataBuilder(
+            TransfersDataBuilder transfersBuilder,
+            TopPlayersSelectionPolicy topPlayersSelectionPolicy
+    ) {
+        this.transfersBuilder = transfersBuilder;
+        this.topPlayersSelectionPolicy = topPlayersSelectionPolicy;
+    }
 
     public ReportData build(
             List<Team> teams,
@@ -24,7 +33,7 @@ public class ReportDataBuilder {
     ) {
         TeamSummary summary = TeamStats.calculateSummary(teams);
         SummaryData summaryData = SummaryData.from(teams, summary);
-        TransfersData transfersData = new TransfersDataBuilder().build(transfers);
+        TransfersData transfersData = transfersBuilder.build(transfers);
 
         var gameweekPlayers = summary.players();
 
@@ -38,13 +47,6 @@ public class ReportDataBuilder {
                 PlayerGameweekStatsFilter.benchOnly(gameweekPlayers),
                 PlayerGameweekStatsFilter.doubtful(gameweekPlayers),
                 PlayerGameweekStatsFilter.highPointsBench(gameweekPlayers),
-
-                PlayerSeasonStatsFilter.filterTopPlayers(
-                        players,
-                        ReportDefaults.TOP_PLAYER_MIN_POINTS,
-                        ReportDefaults.TOP_PLAYER_MIN_PPM,
-                        ReportDefaults.TOP_PLAYER_MIN_XGI
-                )
-        );
+                topPlayersSelectionPolicy.select(players));
     }
 }
