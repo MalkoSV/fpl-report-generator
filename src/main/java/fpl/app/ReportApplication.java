@@ -68,11 +68,7 @@ public class ReportApplication {
             logger.info("ℹ️ Start to export result...");
             List<PlayerSeasonView> playersData = repositories.players().all();
 
-            var outputDirectoryResolver = new OutputDirectoryResolver();
-            File baseDir = new OutputArgumentParser().parse(args)
-                    .orElse(ReportDefaults.DEFAULT_BASE_DIR);
-
-            File outputDir = outputDirectoryResolver.resolve(baseDir);
+            File outputDir = resolveOutputDir(args);
             var outputContext = new OutputContext(outputDir);
 
             var exportService = ReportExportFactory.createExcel();
@@ -89,11 +85,16 @@ public class ReportApplication {
         }
     }
 
-
     private LeagueSelection resolveSelection() throws InterruptedException {
         int input = new PagesCountConsole().askPagesCount();
 
         return LeagueSelectionPolicy.resolve(input);
     }
 
+    private File resolveOutputDir(String[] args) {
+        File baseDir = new OutputArgumentParser()
+                .parse(args)
+                .orElse(ReportDefaults.DEFAULT_BASE_DIR);
+        return new OutputDirectoryResolver().resolve(baseDir);
+    }
 }
