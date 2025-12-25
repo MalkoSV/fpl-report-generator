@@ -71,6 +71,7 @@ public class SummaryTableWriter {
             styler.centered(c1);
 
             Cell c2 = r.createCell(col2);
+            setCellValue(c2, entry.getValue());
             styler.centered(c2);
 
             currentRow++;

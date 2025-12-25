@@ -6,7 +6,7 @@ import fpl.excel.core.ExcelWriter;
 import fpl.excel.io.FileNameGenerator;
 import fpl.domain.model.Team;
 import fpl.output.builder.ReportDataBuilder;
-import fpl.output.excel.SheetWriterFactory;
+import fpl.output.layout.ReportLayout;
 import fpl.output.model.ReportData;
 
 import java.io.File;
@@ -16,18 +16,18 @@ public class ReportExportService {
 
     private final ReportDataBuilder dataBuilder;
     private final ExcelWriter writer;
-    private final SheetWriterFactory sheetWriterFactory;
+    private final ReportLayout layout;
     private final FileNameGenerator fileNameGenerator;
 
     public ReportExportService(
             ReportDataBuilder dataBuilder,
             ExcelWriter writer,
-            SheetWriterFactory sheetWriterFactory,
+            ReportLayout layout,
             FileNameGenerator fileNameGenerator
     ) {
         this.dataBuilder = dataBuilder;
         this.writer = writer;
-        this.sheetWriterFactory = sheetWriterFactory;
+        this.layout = layout;
         this.fileNameGenerator = fileNameGenerator;
     }
 
@@ -52,7 +52,7 @@ public class ReportExportService {
 
         writer.export(
                 outputFile,
-                sheetWriterFactory.create(reportData)
+                layout.buildSheets(reportData)
         );
     }
 

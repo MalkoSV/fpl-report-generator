@@ -5,7 +5,7 @@ import fpl.domain.transfers.TransfersDataBuilder;
 import fpl.excel.io.FileNameGenerator;
 import fpl.output.builder.DefaultTopPlayersSelectionPolicy;
 import fpl.output.builder.ReportDataBuilder;
-import fpl.output.excel.SheetWriterFactory;
+import fpl.output.layout.ReportLayout;
 
 public final class ReportExportFactory {
 
@@ -18,7 +18,7 @@ public final class ReportExportFactory {
                         new DefaultTopPlayersSelectionPolicy()
                 ),
                 ExportConfiguration.excelWriter(),
-                new SheetWriterFactory(),
+                new ReportLayout(),
                 new FileNameGenerator());
     }
 }
