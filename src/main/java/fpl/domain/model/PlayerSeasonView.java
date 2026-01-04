@@ -20,6 +20,7 @@ public record PlayerSeasonView(
         double xG,
         double xA,
         double xGI,
+        double xGC,
 
         int starts,
         int minutes,
@@ -27,6 +28,9 @@ public record PlayerSeasonView(
         int defensiveContribution,
         double defensiveContributionPer90,
         int cleanSheets,
+        int goalsConceded,
+        int penaltiesSaved,
+        int saves,
 
         int penaltiesOrder,
         int directFreekicksOrder,
@@ -58,4 +62,9 @@ public record PlayerSeasonView(
     public double cost() {
         return nowCost()  / 10.0;
     }
+
+    public double goalConcededAndXgcDelta() {
+        return goalsConceded() - xGC();
+    }
+
 }

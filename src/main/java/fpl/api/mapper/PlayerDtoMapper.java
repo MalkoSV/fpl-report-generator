@@ -30,6 +30,7 @@ public class PlayerDtoMapper {
                 dto.expectedGoals(),
                 dto.expectedAssists(),
                 dto.expectedGoalInvolvements(),
+                dto.expectedGoalsConceded(),
 
                 dto.starts(),
                 dto.minutes(),
@@ -37,6 +38,9 @@ public class PlayerDtoMapper {
                 dto.defensiveContribution(),
                 dto.defensiveContributionPer90(),
                 dto.cleanSheets(),
+                dto.goalsConceded(),
+                dto.penaltiesSaved(),
+                dto.saves(),
 
                 dto.penaltiesOrder(),
                 dto.directFreekicksOrder(),

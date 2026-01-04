@@ -6,14 +6,22 @@ import fpl.output.config.ReportDefaults;
 
 import java.util.List;
 
-public class DefaultTopPlayersSelectionPolicy implements TopPlayersSelectionPolicy {
+public class DefaultPlayersSelectionPolicy implements PlayersSelectionPolicy {
     @Override
-    public List<PlayerSeasonView> select(List<PlayerSeasonView> players) {
+    public List<PlayerSeasonView> selectTop(List<PlayerSeasonView> players) {
         return PlayerSeasonStatsFilter.filterTopPlayers(
                 players,
                 ReportDefaults.TOP_PLAYER_MIN_POINTS,
                 ReportDefaults.TOP_PLAYER_MIN_PPM,
                 ReportDefaults.TOP_PLAYER_MIN_XGI
+        );
+    }
+
+    @Override
+    public List<PlayerSeasonView> selectGoalkeepers(List<PlayerSeasonView> players) {
+        return PlayerSeasonStatsFilter.filterGoalkeepers(
+                players,
+                ReportDefaults.GOALKEEPER_MIN_POINTS
         );
     }
 }

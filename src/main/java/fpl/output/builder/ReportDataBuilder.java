@@ -17,14 +17,14 @@ import java.util.List;
 public class ReportDataBuilder {
 
     private final TransfersDataBuilder transfersBuilder;
-    private final TopPlayersSelectionPolicy topPlayersSelectionPolicy;
+    private final PlayersSelectionPolicy playersSelectionPolicy;
 
     public ReportDataBuilder(
             TransfersDataBuilder transfersBuilder,
-            TopPlayersSelectionPolicy topPlayersSelectionPolicy
+            PlayersSelectionPolicy playersSelectionPolicy
     ) {
         this.transfersBuilder = transfersBuilder;
-        this.topPlayersSelectionPolicy = topPlayersSelectionPolicy;
+        this.playersSelectionPolicy = playersSelectionPolicy;
     }
 
     public ReportData build(
@@ -35,7 +35,8 @@ public class ReportDataBuilder {
         TeamSummary lastGameweekSummary = TeamStats.calculateSummary(teams);
         SummaryData summaryData = SummaryData.from(teams, lastGameweekSummary);
         TransfersData transfersData = transfersBuilder.build(transfers);
-        List<PlayerSeasonView> topSeasonPlayers = topPlayersSelectionPolicy.select(seasonPlayers);
+        List<PlayerSeasonView> topSeasonPlayers = playersSelectionPolicy.selectTop(seasonPlayers);
+        List<PlayerSeasonView> seasonGoalkeepers = playersSelectionPolicy.selectGoalkeepers(seasonPlayers);
 
         var gameweekPlayers = lastGameweekSummary.players();
 
@@ -52,7 +53,8 @@ public class ReportDataBuilder {
                 summaryData,
                 transfersData,
                 gameweek,
-                topSeasonPlayers
+                topSeasonPlayers,
+                seasonGoalkeepers
         );
     }
 }

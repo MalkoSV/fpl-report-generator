@@ -5,6 +5,7 @@ import fpl.excel.sheets.BenchPlayersSheetWriter;
 import fpl.excel.sheets.CaptainPlayersSheetWriter;
 import fpl.excel.sheets.DoubtfulPlayersSheetWriter;
 import fpl.excel.sheets.GameweekPlayersSheetWriter;
+import fpl.excel.sheets.GoalkeeperStatsSheetWriter;
 import fpl.excel.sheets.HighPointsBenchSheetWriter;
 import fpl.excel.sheets.PlayerStatsSheetWriter;
 import fpl.excel.sheets.StartPlayersSheetWriter;
@@ -29,7 +30,8 @@ public class ReportLayout {
                 new SummarySheetWriter(data.summaryData()),
                 new TransfersSheetWriter(data.transfersData()),
 
-                new PlayerStatsSheetWriter(data.topSeasonPlayers())
+                new PlayerStatsSheetWriter(data.topSeasonPlayers()),
+                new GoalkeeperStatsSheetWriter(data.seasonGoalkeepers())
         );
     }
 }

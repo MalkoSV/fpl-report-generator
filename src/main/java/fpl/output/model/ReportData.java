@@ -10,5 +10,6 @@ public record ReportData(
         SummaryData summaryData,
         TransfersData transfersData,
         GameweekReportData gameweek,
-        List<PlayerSeasonView> topSeasonPlayers
+        List<PlayerSeasonView> topSeasonPlayers,
+        List<PlayerSeasonView> seasonGoalkeepers
 ) {}
